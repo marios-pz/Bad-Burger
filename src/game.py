@@ -18,13 +18,13 @@ class Game:
         self.running_game: bool = False
 
         # ------------------- TILE MAP ------------------------------------- #
-        self.tile_map = tilemap.TileMap(self.screen)
+        self.tile_map = tilemap.TileMap(self.screen, 32)
 
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
         self.menu = menu.Menu(self.screen, self.clock)
         
-        self.player = player.Player(self.tile_map, 32, self.screen)
+        self.player = player.Player(self.tile_map, self.screen)
 
     @staticmethod
     def __quit__():
@@ -47,7 +47,10 @@ class Game:
             self.clock.tick(set.FPS)
 
             for e in pg.event.get():
-                self.player.handle_events(e)
+                e_pl = self.player.handle_events(e)
+                if type(e_pl) is list:
+                    self.tile_map.add_ices(e_pl)
+
                 if e.type == pg.QUIT:
                     self.__quit__()
                 if e.type == pg.KEYDOWN:
@@ -55,7 +58,11 @@ class Game:
                         self.__returnToMenu__()
 
             self.screen.fill((255, 255, 255))
-            self.tile_map.update()
+            update_tl_map = self.tile_map.update()
+            # check if there are blocks to remove from the player grid
+            if update_tl_map is not None:
+                self.player.reset_ice_blocks(update_tl_map)
+
             self.player.update()
             pg.display.update()
 

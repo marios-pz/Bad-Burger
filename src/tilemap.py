@@ -4,7 +4,7 @@ import src.tiles as tiles
 
 class TileMap:
 
-    def __init__(self, screen):
+    def __init__(self, screen, tile_size):
         self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
 
         # list to store all the ground tiles
@@ -24,7 +24,7 @@ class TileMap:
         }
 
         # TILE SIZE
-        self.TILE_SIZE = (32, 32)
+        self.TILE_SIZE = (tile_size, tile_size)
         self.TLS_X = self.TILE_SIZE[0]  # tile size x shortcut
         self.TLS_Y = self.TILE_SIZE[1]  # tile size y shortcut
 
@@ -51,14 +51,24 @@ class TileMap:
                         self.ground_tiles.append(self.keys[col](self.screen, self.TILE_SIZE, (index_c*self.TLS_X, index_r*self.TLS_Y)))
                 else:
                     if col in self.keys_collider:
-                        self.collider_tiles.append(self.keys_collider[col](self.screen, self.TILE_SIZE, (index_c*self.TLS_X, index_r*self.TLS_Y)))
+                        self.collider_tiles.append(self.keys_collider[col](self.screen, self.TILE_SIZE, (index_c*self.TLS_X, index_r*self.TLS_Y), False, 0))
 
+    def add_ices(self, indexes: list):
+        for index in indexes:
+            self.collider_tiles.append(self.keys_collider["1"](self.screen, self.TILE_SIZE, (index[0][0]*self.TLS_X, index[0][1]*self.TLS_Y), True, index[1]*50))
 
     def update(self): 
         # blit all the tiles on the screen
         for ground_tile in self.ground_tiles:
             ground_tile.update()
 
+        to_remove = []
         # blit all colliders
         for collider in self.collider_tiles:
-            collider.update()
+            kill = collider.update()
+            if kill[0] == "kill":
+                to_remove.append((collider, kill[1]))
+
+        for collider in to_remove:
+            self.collider_tiles.remove(collider[0])
+        return [tr[1] for tr in to_remove] if len([tr[1] for tr in to_remove]) > 0 else None
