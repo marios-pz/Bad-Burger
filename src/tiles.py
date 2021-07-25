@@ -1,8 +1,11 @@
 import pygame as pg
 
 
-class GroundTiles:
 
+class GroundTiles:
+    # Parent Class to store all the ground tiles
+
+    # Subclasses for each ground tile
     class Grass:
 
         def __init__(self, screen, size, coordinates):

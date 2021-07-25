@@ -6,25 +6,30 @@ class Game:
 
     def __init__(self):
         
-        # width, height
+        # ------------------- SCREEN VARIABLES ----------------------------- #
         self.w, self.h = 640, 480
         self.screen = pg.display.set_mode((self.w, self.h), pg.SCALED)
 
+        # ------------------- GAME STATE VARIABLES ------------------------- #
         self.running = True
         self.menu = True
         self.game = False
 
+        # ------------------- TILE MAP ------------------------------------- #
         self.tile_map = tilemap.TileMap(self.screen)
 
     def __quit__(self):
+        # quit the entire program
         pg.quit()
         raise SystemExit
 
     def __returnToMenu__(self):
+        # return from the game to the menu
         self.game = False
         self.menu = True
 
     def __startGame__(self):
+        # go from the menu to the game
         self.game = True
         self.menu = False
 
