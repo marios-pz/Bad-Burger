@@ -1,7 +1,7 @@
 import math
 import pygame
 from src.utils import *
-from src.ratatouille import framework, spec_button
+from src.ratatouille import framework as ratatouille
 from src.settings import *
 import time
 
@@ -24,13 +24,13 @@ class Menu:
 
         # -------------------------- BUTTONS ---------------------------- #
         self.button_image = load_alpha("data/assets/button.png")
-        self.buttons: framework.FrameWork = framework.init(self.screen)
+        self.buttons: ratatouille.FrameWork = ratatouille.init(self.screen)
         self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2 + 80), resize(self.button_image, (100, 40)), resize(self.button_image, (100, 40)), (100, 40), self.stop_running)  # play
         self.buttons.new_special_button((WIDTH // 2 - 160 // 2, HEIGHT // 2 - 50 // 2 + 125), resize(self.button_image, (160, 40)), resize(self.button_image, (160, 40)), (160, 40))  # settings
         self.buttons.new_special_button((WIDTH // 2 - 140 // 2, HEIGHT // 2 - 50 // 2 + 170), resize(self.button_image, (140, 40)), resize(self.button_image, (140, 40)), (140, 40), self.switch_credits)  # credits
         self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2 + 215), resize(self.button_image, (100, 40)), resize(self.button_image, (100, 40)), (100, 40), lambda: quit(-1))  # quit
 
-        self.credits_back: spec_button.SpecialButton = spec_button.SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.switch_credits)
+        self.credits_back: ratatouille.SpecialButton = ratatouille.SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.switch_credits)
 
     def stop_running(self):
         """
