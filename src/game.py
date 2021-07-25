@@ -1,5 +1,6 @@
 import pygame as pg
 import src.tilemap as tilemap
+import src.player as player
 
 
 class Game:
@@ -17,7 +18,8 @@ class Game:
 
         # ------------------- TILE MAP ------------------------------------- #
         self.tile_map = tilemap.TileMap(self.screen)
-
+        self.player = player.Player(150,150, self.tile_map.ground_tiles[2][, self.screen)
+        print(self.tile_map.ground_tiles)
     def __quit__(self):
         # quit the entire program
         pg.quit()
@@ -25,13 +27,11 @@ class Game:
 
     def __returnToMenu__(self):
         # return from the game to the menu
-        self.game = False
-        self.menu = True
+        self.game, self.menu = False, True
 
     def __startGame__(self):
         # go from the menu to the game
-        self.game = True
-        self.menu = False
+        self.game, self.menu = True, False
 
     def run(self):
 
@@ -53,9 +53,8 @@ class Game:
                 pg.display.update()
 
             while self.game:
-
                 for event in pg.event.get():
-
+                    self.player.handle_events(event, self.tile_map.ground_tiles)
                     if event.type == pg.QUIT:
                         self.__quit__()
 
@@ -64,7 +63,8 @@ class Game:
                         if event.key == pg.K_ESCAPE:
                             self.__returnToMenu__()
 
-                    self.screen.fill((255, 255, 255))
-                    self.tile_map.update()
+                    self.screen.fill((255, 255, 255)) # Layer 0
+                    self.tile_map.update() # Layer 1
+                    self.player.update() # Layer 2
 
                     pg.display.update()

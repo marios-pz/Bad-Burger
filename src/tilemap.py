@@ -52,8 +52,7 @@ class TileMap:
                         self.collider_tiles.append(self.keys_collider[col](self.screen, self.TILE_SIZE, (index_c*self.TLS_X, index_r*self.TLS_Y)))
 
 
-    def update(self):
-        
+    def update(self): 
         # blit all the tiles on the screen
         for ground_tile in self.ground_tiles:
             ground_tile.update()
