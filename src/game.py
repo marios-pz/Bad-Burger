@@ -24,8 +24,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.menu = menu.Menu(self.screen, self.clock)
         
-        self.ground = self.tile_map.ground_tiles # I need this for player's pos
-        self.player = player.Player(self.ground, 32, self.screen)
+        self.player = player.Player(self.tile_map, 32, self.screen)
 
     @staticmethod
     def __quit__():
@@ -55,10 +54,10 @@ class Game:
                     if e.key == pg.K_ESCAPE:
                         self.__returnToMenu__()
 
-                self.screen.fill((255, 255, 255))
-                self.tile_map.update()
-                self.player.update()
-                pg.display.update()
+            self.screen.fill((255, 255, 255))
+            self.tile_map.update()
+            self.player.update()
+            pg.display.update()
 
     def run(self):
         while self.running:

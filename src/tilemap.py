@@ -31,6 +31,8 @@ class TileMap:
         self.read_map("map", False)
         self.read_map("map_collider", True)
 
+        self.current_map_collider = "map_collider"
+
     def read_map(self, name, collider):
 
         # get the doc
