@@ -14,6 +14,7 @@ class Menu:
         self.H: int = HEIGHT
 
         # ---------------------- VARIABLES ------------------------------ #
+        self.logo: pygame.surface.Surface = load_alpha("data/assets/logo.png")
         self.running: bool = True
         self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
         self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
@@ -24,10 +25,10 @@ class Menu:
         # -------------------------- BUTTONS ---------------------------- #
         self.button_image = load_alpha("data/assets/button.png")
         self.buttons: framework.FrameWork = framework.init(self.screen)
-        self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2), resize(self.button_image, (100, 50)), resize(self.button_image, (100, 50)), (100, 50), self.stop_running)  # play
-        self.buttons.new_special_button((WIDTH // 2 - 160 // 2, HEIGHT // 2 - 50 // 2 + 55), resize(self.button_image, (160, 50)), resize(self.button_image, (160, 50)), (160, 50))  # settings
-        self.buttons.new_special_button((WIDTH // 2 - 140 // 2, HEIGHT // 2 - 50 // 2 + 110), resize(self.button_image, (140, 50)), resize(self.button_image, (140, 50)), (140, 50), self.switch_credits)  # credits
-        self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2 + 165), resize(self.button_image, (100, 50)), resize(self.button_image, (100, 50)), (100, 50), lambda: quit(-1))  # quit
+        self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2 + 80), resize(self.button_image, (100, 40)), resize(self.button_image, (100, 40)), (100, 40), self.stop_running)  # play
+        self.buttons.new_special_button((WIDTH // 2 - 160 // 2, HEIGHT // 2 - 50 // 2 + 125), resize(self.button_image, (160, 40)), resize(self.button_image, (160, 40)), (160, 40))  # settings
+        self.buttons.new_special_button((WIDTH // 2 - 140 // 2, HEIGHT // 2 - 50 // 2 + 170), resize(self.button_image, (140, 40)), resize(self.button_image, (140, 40)), (140, 40), self.switch_credits)  # credits
+        self.buttons.new_special_button((WIDTH // 2 - 100 // 2, HEIGHT // 2 - 50 // 2 + 215), resize(self.button_image, (100, 40)), resize(self.button_image, (100, 40)), (100, 40), lambda: quit(-1))  # quit
 
         self.credits_back: spec_button.SpecialButton = spec_button.SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.switch_credits)
 
@@ -44,22 +45,21 @@ class Menu:
     def draw(self):
         self.screen.fill((255, 100, 50))
 
-        label = self.font_60.render("Bad Burger", True, (0, 0, 0))
-        self.screen.blit(label, (self.W / 2 - label.get_width() / 2, (self.H / 2 - label.get_height() / 2 - 30) + math.sin(time.time() * 5) * 5 - 25))
+        self.screen.blit(self.logo, (self.W//2 - self.logo.get_width()//2, 20 + math.sin(time.time() * 5) * 5 - 25))
 
         self.buttons.update()
 
-        label = self.font_50.render("play", True, (0, 0, 0))
-        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2))
+        label = self.font_40.render("play", True, (0, 0, 0))
+        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 80))
 
-        label = self.font_50.render("settings", True, (0, 0, 0))
-        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 55))
+        label = self.font_40.render("settings", True, (0, 0, 0))
+        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 125))
 
-        label = self.font_50.render("credits", True, (0, 0, 0))
-        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 110))
+        label = self.font_40.render("credits", True, (0, 0, 0))
+        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 170))
 
-        label = self.font_50.render("quit", True, (0, 0, 0))
-        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 165))
+        label = self.font_40.render("quit", True, (0, 0, 0))
+        self.screen.blit(label, (WIDTH // 2 - label.get_width() // 2, HEIGHT // 2 - label.get_height() // 2 + 215))
 
         if self.credits:
             self.screen.blit(resize_ratio(load_alpha("data/assets/credits-background.png"), (540, 380)), (50, 50))
