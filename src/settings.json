@@ -1,0 +1,16 @@
+{
+    "WIDTH": 640,
+    "HEIGHT": 480,
+    "FPS": 30,
+    "credits": [
+        "credits",
+        "programing:",
+        "emc235 | fkS | Mario | hk",
+        "art:",
+        "Mario | hk",
+        "music:",
+        "Mario | hk | fkS"
+    ],
+    "play_music": true,
+    "play_sfx": true
+}

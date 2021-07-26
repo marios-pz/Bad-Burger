@@ -1,8 +1,9 @@
 import pygame as pg
+from src.utils import *
 import src.tilemap as tilemap
 import src.player as player
-import src.settings as set
 import src.menu as menu
+
 
 class Game:
 
@@ -26,25 +27,31 @@ class Game:
         
         self.player = player.Player(self.tile_map, self.screen)
 
+        # --------------- VARIABLES ---------------------------------------- #
+        self.settings = get_json("src/settings")
+
     @staticmethod
     def __quit__():
+        # reset the settings
+        reset_settings()
         # quit the entire program
         pg.quit()
         raise SystemExit
 
-    def __returnToMenu__(self): # return from the game to the menu       
+    def __returnToMenu__(self):  # return from the game to the menu
         self.running_game, self.running_menu = False, True
 
-    def __startGame__(self): # go from the menu to the game       
+    def __startGame__(self):  # go from the menu to the game
         self.running_game, self.running_menu = True, False
 
     def run_menu(self):
-        self.menu.run(set.FPS)
+        self.menu.run(self.settings["FPS"])
         self.__startGame__()
+        self.settings = get_json("src/settings")
 
     def run_game(self):
         while self.running_game:
-            self.clock.tick(set.FPS)
+            self.clock.tick(self.settings["FPS"])
 
             for e in pg.event.get():
                 e_pl = self.player.handle_events(e)
