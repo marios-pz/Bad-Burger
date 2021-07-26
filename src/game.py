@@ -43,7 +43,7 @@ class Game:
         self.running_game, self.running_menu = True, False
 
     def run_menu(self):
-        self.menu.run(set.FPS)
+        self.menu.run(self.settings["FPS"])
         self.__startGame__()
         self.settings = get_json("src/settings")
 
