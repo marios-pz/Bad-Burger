@@ -25,12 +25,9 @@ class GroundTiles:
     class Rock:
 
         def __init__(self, screen, size, coordinates):
-
             self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
-
             self.image = pg.Surface(size)
             self.image.fill((100, 100, 100))
-
             self.rect = self.image.get_rect(topleft=coordinates)
 
         def update(self):
@@ -67,14 +64,11 @@ class ColliderTiles:
             self.current_time = pg.time.get_ticks()
             if self.destructing:
                 if self.current_time - self.delay > 500:
-                    return "kill", self.cell
+                    return "kill", self.cell # Else, we are playing a animation
 
             if self.happening:
                 if self.current_time - self.delay_happening > 50:
-                    self.happening = False
-                
-                    
+                    self.happening = False                         
             else:
                 self.screen.blit(self.image, self.rect)
-
             return None, None

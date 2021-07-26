@@ -29,6 +29,14 @@ class Player:
         with open(f"data/{name}.txt", "r") as f:
             datas = f.readlines()
 
+        '''
+        self.player_grid = [  We change to this one if it isn't glitchy
+
+            [0 if col == '0' else 1 for col in row.strip()]          
+            for row in datas
+        ]
+        '''
+       
         self.player_grid = []
         for row in datas:
             row = row.strip()
@@ -36,7 +44,7 @@ class Player:
             for col in row:
                 line.append(0) if col == "0" else line.append(1)
             self.player_grid.append(line)
-
+        
     def handle_events(self, event):
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
