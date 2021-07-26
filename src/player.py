@@ -1,6 +1,8 @@
 import pygame as p
 from src.tiles import ColliderTiles as CT
 import copy
+from os import listdir
+from src.utils import *
 
 
 class Player:
@@ -22,9 +24,19 @@ class Player:
 
         self.moving = False
         self.direction = "right"
-        self.velocity = 6
+        self.velocity = 5
 
         self.ordered_spell = False
+        self.casting_spell = False
+
+        self.current_time = p.time.get_ticks()
+        self.began_casting_spell = 0
+        self.delay_anim = 0
+
+        self.moving_anim_right = [load_alpha(f"data/assets/player/walk-right/{file}") for file in listdir("data/assets/player/walk-right")]
+        self.moving_anim_right = [resize(img, (32, 32)) for img in self.moving_anim_right]
+        self.index_anim = 0
+        
 
     def read_map(self, name):
 
@@ -48,9 +60,14 @@ class Player:
             self.player_grid.append(line)
         
     def handle_events(self, event):
+        # have to fix this for the ordered spell
+        """if self.ordered_spell and not self.moving and not self.casting_spell:
+            self.ordered_spell = False
+            return self.cast_spell()"""
+
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
-                if not self.moving:
+                if not self.moving and not self.casting_spell:
                     return self.cast_spell()    
                 else:
                     self.ordered_spell = True
@@ -75,6 +92,8 @@ class Player:
             next_cell = [self.index[0]-1, self.index[1]]
 
         is_ice = self.check_ice_block(next_cell)
+        self.casting_spell = True
+        self.began_casting_spell = p.time.get_ticks()
         if is_ice[0]:
             self.spell_ice(next_cell, True)
         else:
@@ -191,7 +210,7 @@ class Player:
 
     def manage_animation(self, dt):
         if self.direction == "right":
-            if self.rect.x + self.velocity >= self.index[0]*self.TLS_X:
+            if self.rect.x + (self.velocity) >= self.index[0]*self.TLS_X:
                 self.moving = False
                 self.rect.x += (self.index[0]*self.TLS_X - self.rect.x)
             else:
@@ -216,14 +235,37 @@ class Player:
                 self.rect.y += self.velocity
 
     def update(self, dt):
+        # update current time
+        self.current_time = p.time.get_ticks()
+
         # animate the player while moving to another tile
         if self.moving:
+
+            if self.direction == "right":
+
+                if self.current_time - self.delay_anim > 75:
+                    self.delay_anim = self.current_time
+                    self.index_anim = (self.index_anim + 1) % len(self.moving_anim_right)
+
+                    self.surface = self.moving_anim_right[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
             self.manage_animation(dt)
+
+        elif self.casting_spell:
+
+            if self.current_time - self.began_casting_spell > 500:
+                self.casting_spell = False
+
+            # PUT HERE THE ANIMATION OF THE CASTING SPELL
+
+        else:
+            pass
+            # PUT HERE HIS WAITING ANIMATION
 
         # draw the player
         self.screen.blit(self.surface, self.rect)
 
-        # if not self.ordered_spell:
         # get keys pressed
         pressed = p.key.get_pressed()
         if pressed[p.K_LEFT]:
@@ -234,7 +276,6 @@ class Player:
             self.move_down()
         elif pressed[p.K_UP]:
             self.move_up()
-        """else:
-            if not self.moving:
-                self.ordered_spell = False
-                return self.cast_spell()"""
+
+        #pg.draw.rect(self.screen, (255, 0, 0), self.rect)
+
