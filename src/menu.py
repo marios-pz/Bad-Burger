@@ -1,7 +1,10 @@
 import math
+from itertools import cycle
 import pygame
 from .ratatouille import *
+import random
 from .utils import *
+import os
 import time
 
 
@@ -29,6 +32,7 @@ class Menu:
         self.clicked_first_button: bool = False
         self.last_time: float = time.time()
         self.dt: float = None
+        self.fake_players: list = [_FakePlayer(0 + -100*i, random.randint(270, 370), 10) for i in range(7)]
 
         # -------------------------- BUTTONS ---------------------------- #
         self.button_image = load_alpha("data/assets/button.png")
@@ -81,6 +85,11 @@ class Menu:
 
     def draw(self):
         self.screen.fill((255, 100, 50))
+        self.screen.blit(load_alpha("data/assets/bg.png"), (0, 0))
+        for fake_player in self.fake_players:
+            fake_player.move(self.dt)
+            fake_player.animate()
+            fake_player.update(self.screen)
 
         self.screen.blit(self.logo, (self.W//2 - self.logo.get_width()//2, (20 + math.sin(time.time() * 5) * 5 - 25)*self.dt))
         self.sound_buttons.update()
@@ -151,3 +160,44 @@ class Menu:
             self.draw()
             self.event_handler()
         write_json("src/settings", self.settings)
+
+
+class _FakePlayer:
+    def __init__(self, x: int, y: int, vel: int):
+        self.x = x
+        self.y = y
+        self.walking_right_animation = cycle([load_alpha(f"""data/assets/walk_right/{filename}""") for filename in os.listdir("data/assets/walk_right/")])
+        self.vel = vel
+        self.jump_count = 10
+        self.is_jumping = False
+        self.frames_per_image = 2
+        self.time = 0
+        self.settings = get_json("src/settings")
+        self.current_image = next(self.walking_right_animation)
+
+    def move(self, dt):
+        if self.x >= 0:
+            if self.is_jumping:
+                if self.jump_count >= -10:
+                    self.y -= (self.jump_count * abs(self.jump_count)) / 2
+                    self.jump_count -= 1
+                else:
+                    self.jump_count = 10
+                    self.is_jumping = False
+
+        if random.randint(0, 1000) > 800 and not self.is_jumping:
+            self.is_jumping = True
+
+        self.x += self.vel*dt
+        if self.x >= self.settings["WIDTH"] + 50:
+            self.x = 0
+
+    def animate(self):
+        if self.time >= self.frames_per_image:
+            self.time = 0
+            self.current_image = next(self.walking_right_animation)
+        self.time += 1
+
+    def update(self, screen: pygame.surface.Surface):
+        if self.x >= -50:
+            screen.blit(self.current_image, (self.x, self.y))
