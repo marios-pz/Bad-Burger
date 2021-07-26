@@ -33,7 +33,7 @@ class Player:
         self.began_casting_spell = 0
         self.delay_anim = 0
 
-        self.moving_anim_right = [load_alpha(f"data/assets/player/walk-right/{file}") for file in listdir("data/assets/player/walk-right")]
+        self.moving_anim_right = [load_alpha(f"data/assets/walk_right/{file}") for file in listdir("data/assets/player/walk-right")]
         self.moving_anim_right = [resize(img, (32, 32)) for img in self.moving_anim_right]
         self.index_anim = 0
         
