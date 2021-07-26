@@ -43,10 +43,11 @@ class ColliderTiles:
             self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
             self.happening = happening
             
-            self.image = load_alpha("data/assets/table.png")
-            self.image = resize(self.image, size) 
+            self.image = load_alpha("data/assets/iceblock.png")
+            #self.image = resize(self.image, size) 
+            self.image.set_alpha(199)
 
-            self.rect = self.image.get_rect(topleft=coordinates)
+            self.rect = self.image.get_rect(bottomleft=coordinates+pg.Vector2(0, 32))
 
             self.current_time = pg.time.get_ticks()
             self.delay_happening = pg.time.get_ticks()+delay_happening
@@ -67,7 +68,7 @@ class ColliderTiles:
                     return "kill", self.cell # Else, we are playing a animation
 
             if self.happening:
-                if self.current_time - self.delay_happening > 50:
+                if self.current_time - self.delay_happening > 100:
                     self.happening = False                         
             else:
                 self.screen.blit(self.image, self.rect)

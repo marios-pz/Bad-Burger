@@ -1,9 +1,9 @@
 import pygame as pg
-from src.utils import *
+import copy
 import src.tilemap as tilemap
 import src.player as player
+import src.settings as set
 import src.menu as menu
-
 
 class Game:
 
@@ -27,31 +27,79 @@ class Game:
         
         self.player = player.Player(self.tile_map, self.screen)
 
-        # --------------- VARIABLES ---------------------------------------- #
-        self.settings = get_json("src/settings")
-
     @staticmethod
     def __quit__():
-        # reset the settings
-        reset_settings()
         # quit the entire program
         pg.quit()
         raise SystemExit
 
-    def __returnToMenu__(self):  # return from the game to the menu
+    def __returnToMenu__(self): # return from the game to the menu       
         self.running_game, self.running_menu = False, True
 
-    def __startGame__(self):  # go from the menu to the game
+    def __startGame__(self): # go from the menu to the game       
         self.running_game, self.running_menu = True, False
 
     def run_menu(self):
-        self.menu.run(self.settings["FPS"])
+        self.menu.run(set.FPS)
         self.__startGame__()
-        self.settings = get_json("src/settings")
+
+    def show_above_player(self):
+        grid = self.player.player_grid
+        
+        if self.player.index[1] + 1 < len(grid):
+            if self.player.index[0] - 1 >= 0:
+                cell1 = [self.player.index[0]-1, self.player.index[1]+1]
+                block = self.get_block(cell1)
+                if block is not None:
+                    return True
+            
+            cell2 = [self.player.index[0], self.player.index[1]+1]
+            block = self.get_block(cell2)
+            if block is not None:
+                return True
+
+            if self.player.index[0] + 1 < len(grid[self.player.index[1]]):
+                cell3 = [self.player.index[0]+1, self.player.index[1]+1]
+                block = self.get_block(cell3)
+                if block is not None:
+                    return True
+        return False    
+
+    def get_block(self, index):
+        
+        for tiles in self.tile_map.collider_tiles:
+            for tile in tiles:
+                if tile is not None:
+                    
+                    if tile.rect.collidepoint(index[0]*self.tile_map.TLS_X, index[1]*self.tile_map.TLS_Y):
+                        return tile
+
+    def update_player_and_tiles(self):
+
+            self.tile_map.update_ground()
+
+            if not self.show_above_player():
+                update_tl_map_col = self.tile_map.update_colliders()
+                # check if there are blocks to remove from the player grid
+                if update_tl_map_col is not None:
+                    self.player.reset_ice_blocks(update_tl_map_col)
+
+                update_pl = self.player.update()
+                if update_pl is not None:
+                    pass
+            else:
+                update_pl = self.player.update()
+                if update_pl is not None:
+                    pass
+
+                update_tl_map_col = self.tile_map.update_colliders()
+                # check if there are blocks to remove from the player grid
+                if update_tl_map_col is not None:
+                    self.player.reset_ice_blocks(update_tl_map_col)
 
     def run_game(self):
         while self.running_game:
-            self.clock.tick(self.settings["FPS"])
+            self.clock.tick(set.FPS)
 
             for e in pg.event.get():
                 e_pl = self.player.handle_events(e)
@@ -65,12 +113,9 @@ class Game:
                         self.__returnToMenu__()
 
             self.screen.fill((255, 255, 255))
-            update_tl_map = self.tile_map.update()
-            # check if there are blocks to remove from the player grid
-            if update_tl_map is not None:
-                self.player.reset_ice_blocks(update_tl_map)
 
-            self.player.update()
+            self.update_player_and_tiles()
+
             pg.display.update()
 
     def run(self):

@@ -24,6 +24,8 @@ class Player:
         self.direction = "right"
         self.velocity = 6
 
+        self.ordered_spell = False
+
     def read_map(self, name):
 
         with open(f"data/{name}.txt", "r") as f:
@@ -48,12 +50,13 @@ class Player:
     def handle_events(self, event):
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
-                return self.cast_spell()    
+                if not self.moving:
+                    return self.cast_spell()    
+                else:
+                    self.ordered_spell = True
                     
 
     def cast_spell(self):
-        if self.moving:
-            return
 
         if self.direction == "down":
             if self.index[1]+1 > len(self.player_grid):
@@ -123,20 +126,14 @@ class Player:
             else:
                 
                 is_available = self.is_blank(first_cell)
-                print(is_available)
-
 
             count += 1
 
         return indexes if not destruct else None
 
     def check_ice_block(self, index: tuple[int, int]):
-        pos = index[0]*self.TLS_X, index[1]*self.TLS_Y
-        pos += p.Vector2(*self.TILE_SIZE)//2
-
-        for tile in self.tile_map.collider_tiles:
-            if tile.rect.collidepoint(pos) and type(tile) is CT.IceBlock:
-                return True, tile
+        if type(self.tile_map.collider_tiles[index[1]][index[0]]) is CT.IceBlock:
+            return True, self.tile_map.collider_tiles[index[1]][index[0]]
         return False, None
 
     def is_blank(self, indexes):
@@ -225,6 +222,10 @@ class Player:
         if self.moving:
             self.manage_animation()
 
+        # draw the player
+        self.screen.blit(self.surface, self.rect)
+
+        #if not self.ordered_spell:
         # get keys pressed
         pressed = p.key.get_pressed()
         if pressed[p.K_LEFT]:
@@ -235,7 +236,10 @@ class Player:
             self.move_down()
         elif pressed[p.K_UP]:
             self.move_up()
+        """else:
+            if not self.moving:
+                self.ordered_spell = False
+                return self.cast_spell()"""
 
-        # draw the player
-        self.screen.blit(self.surface, self.rect)
+        
 
