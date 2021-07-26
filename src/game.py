@@ -103,7 +103,7 @@ class Game:
 
     def run_game(self):
         while self.running_game:
-            self.clock.tick(set.FPS)
+            self.clock.tick(self.settings["FPS"])
 
             for e in pg.event.get():
                 e_pl = self.player.handle_events(e)
