@@ -37,6 +37,11 @@ class Player:
         self.moving_anim_right = [resize(img, (32, 32)) for img in self.moving_anim_right]
         self.index_anim = 0
         
+        self.moving_anim_down = [load_alpha(f"data/assets/walk_down/{file}") for file in listdir("data/assets/walk_down")]
+        self.moving_anim_down = [resize(img, (32, 32)) for img in self.moving_anim_down]
+
+        self.moving_anim_up = [load_alpha(f"data/assets/walk_up/{file}") for file in listdir("data/assets/walk_up")]
+        self.moving_anim_up = [resize(img, (32, 32)) for img in self.moving_anim_up]
 
     def read_map(self, name):
 
@@ -234,21 +239,36 @@ class Player:
             else:
                 self.rect.y += self.velocity
 
+    def animate(self):
+        self.current_time = p.time.get_ticks()
+
+        if self.current_time - self.delay_anim > 75:
+                self.delay_anim = self.current_time
+                self.index_anim = (self.index_anim + 1) % len(self.moving_anim_right)
+
+                if self.direction == "right":
+
+                    self.surface = self.moving_anim_right[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "down":
+
+                    self.surface = self.moving_anim_down[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "up":
+
+                    self.surface = self.moving_anim_up[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
     def update(self, dt):
         # update current time
         self.current_time = p.time.get_ticks()
 
         # animate the player while moving to another tile
         if self.moving:
-
-            if self.direction == "right":
-
-                if self.current_time - self.delay_anim > 75:
-                    self.delay_anim = self.current_time
-                    self.index_anim = (self.index_anim + 1) % len(self.moving_anim_right)
-
-                    self.surface = self.moving_anim_right[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
+            
+            self.animate()
 
             self.manage_animation(dt)
 
@@ -269,12 +289,16 @@ class Player:
         # get keys pressed
         pressed = p.key.get_pressed()
         if pressed[p.K_LEFT]:
+            self.animate()
             self.move_left()
         elif pressed[p.K_RIGHT]:
+            self.animate()
             self.move_right()
         elif pressed[p.K_DOWN]:
+            self.animate()
             self.move_down()
         elif pressed[p.K_UP]:
+            self.animate()
             self.move_up()
 
         #pg.draw.rect(self.screen, (255, 0, 0), self.rect)
