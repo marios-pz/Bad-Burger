@@ -11,14 +11,14 @@ class Player:
 
         # image
         self.surface = p.Surface(tile_map.TILE_SIZE)
-        self.surface.fill((255,0,0))
+        self.surface.fill((255, 0, 0))
 
         self.player_grid = []
         self.read_map(self.tile_map.current_map_collider)
         self.index = [0, 0]
 
         # rect
-        self.rect = self.surface.get_rect(topleft= p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
+        self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
 
         self.moving = False
         self.direction = "right"
@@ -54,7 +54,6 @@ class Player:
                     return self.cast_spell()    
                 else:
                     self.ordered_spell = True
-                    
 
     def cast_spell(self):
 
@@ -80,7 +79,6 @@ class Player:
             self.spell_ice(next_cell, True)
         else:
             return self.spell_ice(next_cell, False)
-            
 
     def reset_ice_blocks(self, indexes: list):
         for index in indexes:
@@ -191,7 +189,7 @@ class Player:
             return True
         return False
 
-    def manage_animation(self):
+    def manage_animation(self, dt):
         if self.direction == "right":
             if self.rect.x + self.velocity >= self.index[0]*self.TLS_X:
                 self.moving = False
@@ -201,7 +199,7 @@ class Player:
         elif self.direction == "left":
             if self.rect.x - self.velocity <= self.index[0]*self.TLS_X:
                 self.moving = False
-                self.rect.x -= (self.rect.x - self.index[0]*self.TLS_X )
+                self.rect.x -= (self.rect.x - self.index[0]*self.TLS_X)
             else:
                 self.rect.x -= self.velocity
         elif self.direction == "up":
@@ -213,19 +211,19 @@ class Player:
         elif self.direction == "down":
             if self.rect.y + self.velocity >= self.index[1]*self.TLS_Y:
                 self.moving = False
-                self.rect.y += ((self.index[1]*self.TLS_Y-self.rect.y))
+                self.rect.y += (self.index[1]*self.TLS_Y-self.rect.y)
             else:
                 self.rect.y += self.velocity
 
-    def update(self):
+    def update(self, dt):
         # animate the player while moving to another tile
         if self.moving:
-            self.manage_animation()
+            self.manage_animation(dt)
 
         # draw the player
         self.screen.blit(self.surface, self.rect)
 
-        #if not self.ordered_spell:
+        # if not self.ordered_spell:
         # get keys pressed
         pressed = p.key.get_pressed()
         if pressed[p.K_LEFT]:
@@ -240,6 +238,3 @@ class Player:
             if not self.moving:
                 self.ordered_spell = False
                 return self.cast_spell()"""
-
-        
-

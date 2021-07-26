@@ -146,7 +146,7 @@ class Menu:
         while self.running:
             self.clock.tick(fps)
             self.dt = time.time() - self.last_time
-            self.dt *= 60
+            self.dt *= fps
             self.last_time = time.time()
             self.draw()
             self.event_handler()
