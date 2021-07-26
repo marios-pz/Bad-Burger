@@ -1,9 +1,9 @@
 import pygame as pg
-import copy
+from src.utils import *
 import src.tilemap as tilemap
 import src.player as player
-import src.settings as set
 import src.menu as menu
+
 
 class Game:
 
@@ -27,6 +27,9 @@ class Game:
         
         self.player = player.Player(self.tile_map, self.screen)
 
+        # --------------- VARIABLES ---------------------------------------- #
+        self.settings = get_json("src/settings")
+
     @staticmethod
     def __quit__():
         # quit the entire program
@@ -42,6 +45,7 @@ class Game:
     def run_menu(self):
         self.menu.run(set.FPS)
         self.__startGame__()
+        self.settings = get_json("src/settings")
 
     def show_above_player(self):
         grid = self.player.player_grid
