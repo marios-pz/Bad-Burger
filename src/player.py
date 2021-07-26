@@ -12,8 +12,7 @@ class Player:
         self.tile_map, self.TLS_X, self.TLS_Y, self.TILE_SIZE = tile_map, tile_map.TLS_X, tile_map.TLS_Y, tile_map.TILE_SIZE
 
         # image
-        self.surface = p.Surface(tile_map.TILE_SIZE)
-        self.surface.fill((255, 0, 0))
+        self.surface = resize(load_alpha("data/assets/walk_right/Sprite-0007.png"), (32, 32))
 
         self.player_grid = []
         self.read_map(self.tile_map.current_map_collider)
@@ -42,6 +41,8 @@ class Player:
 
         self.moving_anim_up = [load_alpha(f"data/assets/walk_up/{file}") for file in listdir("data/assets/walk_up")]
         self.moving_anim_up = [resize(img, (32, 32)) for img in self.moving_anim_up]
+
+        self.moving_anim_left = [p.transform.flip(img, True, False) for img in self.moving_anim_right]
 
     def read_map(self, name):
 
@@ -259,6 +260,11 @@ class Player:
                 elif self.direction == "up":
 
                     self.surface = self.moving_anim_up[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "left":
+                    
+                    self.surface = self.moving_anim_left[self.index_anim]
                     self.rect = self.surface.get_rect(center=self.rect.center)
 
     def update(self, dt):
