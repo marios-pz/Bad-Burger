@@ -24,6 +24,7 @@ class Menu:
         self.sfx_on: pygame.surface.Surface = load_alpha("data/assets/sfx_on.png")
         self.sfx_off: pygame.surface.Surface = load_alpha("data/assets/sfx_off.png")
         self.button_image = load_alpha("data/assets/button.png")
+        self.button_hover_image = load_alpha("data/assets/button_hover.png")
         self.running: bool = True
         self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
         self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
@@ -38,13 +39,13 @@ class Menu:
         # -------------------------- BUTTONS ---------------------------- #
 
         self.buttons: FrameWork = init(self.screen)
-        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_image, (100, 40), self.stop_running)  # play
-        self.buttons.new_special_button((self.W // 2 - 160 // 2, self.H // 2 - 50 // 2 + 125), self.button_image, self.button_image, (160, 40))  # settings
-        self.buttons.new_special_button((self.W // 2 - 140 // 2, self.H // 2 - 50 // 2 + 170), self.button_image, self.button_image, (140, 40), self.switch_credits)  # credits
-        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 215), self.button_image, self.button_image, (100, 40),  self.__quit__)  # quit
+        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_hover_image, (100, 40), self.stop_running)  # play
+        self.buttons.new_special_button((self.W // 2 - 160 // 2, self.H // 2 - 50 // 2 + 125), self.button_image, self.button_hover_image, (160, 40))  # settings
+        self.buttons.new_special_button((self.W // 2 - 140 // 2, self.H // 2 - 50 // 2 + 170), self.button_image, self.button_hover_image, (140, 40), self.switch_credits)  # credits
+        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 215), self.button_image, self.button_hover_image, (100, 40),  self.__quit__)  # quit
 
-        self.credits_back: SpecialButton = SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.switch_credits)
-        self.start_menu: SpecialButton = SpecialButton((self.W // 2 - 170 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_image, (170, 40), self.toggle_clicked_first_button)
+        self.credits_back: SpecialButton = SpecialButton((self.W//2 - 100//2, 350), self.button_image, self.button_hover_image, (100, 40), self.switch_credits)
+        self.start_menu: SpecialButton = SpecialButton((self.W // 2 - 170 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_hover_image, (170, 40), self.toggle_clicked_first_button)
 
         self.sound_buttons: FrameWork = init(self.screen)
         self.sound_buttons.new_special_button((self.W - 35, 5), self.music_on if self.settings["play_music"] else self.music_off, self.music_on if self.settings["play_music"] else self.music_off, (32, 32), self.toggle_sounds)
@@ -97,31 +98,37 @@ class Menu:
         self.sound_buttons.update()
 
         if self.clicked_first_button:
-            self.buttons.update()
-
-            label = self.font_40.render("play", True, (0, 0, 0))
-            self.screen.blit(label, (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 75))
-
-            label = self.font_40.render("settings", True, (0, 0, 0))
-            self.screen.blit(label, (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 120))
-
-            label = self.font_40.render("credits", True, (0, 0, 0))
-            self.screen.blit(label, (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 165))
-
-            label = self.font_40.render("quit", True, (0, 0, 0))
-            self.screen.blit(label, (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 210))
 
             if self.credits:
-                self.screen.blit(resize_ratio(load_alpha("data/assets/credits-background.png"), (540, 380)), (50, 50))
-                self.credits_back.update(self.screen)
+                self.screen.blit(resize_ratio(load_alpha("data/assets/credits-background.png"), (self.W, self.H)), (0, 0))
 
+                self.credits_back.update(self.screen)
                 label = self.font_40.render("back", True, (0, 0, 0))
-                self.screen.blit(label, (5 + 100 // 2 - label.get_width() // 2, 0 + 50 // 2 - label.get_height() // 2))
+                self.screen.blit(label, (self.W//2 - label.get_width()//2, self.credits_back.rect[1] + self.credits_back.rect[3]//2 - label.get_height()//2))
 
                 height = self.font_40.get_height()
                 for i, text in enumerate(self.settings["credits"]):
                     rendered_text_surface = self.font_40.render(text, True, (0, 0, 0))
                     self.screen.blit(rendered_text_surface, (self.W / 2 - rendered_text_surface.get_width() / 2, 50 + (380 - height * len(self.settings["credits"])) / 2 + (i * height)))
+
+            else:
+                self.buttons.update()
+
+                label = self.font_40.render("play", True, (0, 0, 0))
+                self.screen.blit(label,
+                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 75))
+
+                label = self.font_40.render("settings", True, (0, 0, 0))
+                self.screen.blit(label,
+                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 120))
+
+                label = self.font_40.render("credits", True, (0, 0, 0))
+                self.screen.blit(label,
+                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 165))
+
+                label = self.font_40.render("quit", True, (0, 0, 0))
+                self.screen.blit(label,
+                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 210))
 
         else:
             self.start_menu.update(self.screen)

@@ -22,32 +22,39 @@ class LevelSelector:
 
         # ------------------ VARIABLES ---------------------------- #
         self.running: bool = True
+        self.button_size: tuple[int, int] = (40, 40)
         self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
         self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
         self.font_40: pygame.font.Font = pygame.font.Font(None, 40)
         self.clock: pygame.time.Clock = clock
         self.table: pygame.surface.Surface = load_alpha("data/assets/table.png")
-        self.level_not_available: pygame.surface.Surface = load_alpha("data/assets/level_not_available.png")
-        self.foreground_image = resize_ratio(load_alpha("data/assets/credits-background.png"), (540, 380))
+        self.level_not_available: pygame.surface.Surface = resize(load_alpha("data/assets/level_not_available.png"), self.button_size)
+        self.background_image = pygame.transform.scale(load_alpha("data/assets/credits-background.png"), (self.W, self.H))
         self.button_image = load_alpha("data/assets/button.png")
+        self.button_hover_image = load_alpha("data/assets/button_hover.png")
+        self.buttons_unlocked_hovering = [resize(load(f"data/assets/hover_button_animation/hover_unlocked_{i+1}.png"), self.button_size) for i in range(2)]
         self.selected_level: int = None
         self.available_levels: int = available_levels
         self.last_level_unlocked: int = last_level_unlocked
         self.response: any = None
+        self.time: int = 0
+        self.spacing_per_button = 10
+        self.frames_per_sprite: int = 3
 
         # ------------------- BUTTONS ----------------------------- #
         self.level_buttons: ratatouille.FrameWork = ratatouille.init(self.screen)
-        self.button_size: tuple[int, int] = (50, 50)
-        self.spacing_per_button = 10
-        x, y = 85, 150
-        for available_level in range(self.available_levels):
-            self.level_buttons.new_special_button((x, y), self.button_image, self.button_image, (50, 50), self._get_level, (available_level+1, ))
-            x += self.button_size[0] + self.spacing_per_button
-            if x >= 540:
-                x = 85
-                y += self.button_size[1] + self.spacing_per_button
+        self.load_buttons()
 
-        self.back_button = ratatouille.SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.back)
+        self.back_button = ratatouille.SpecialButton((self.W//2 - 100//2, self.H - 100), self.button_image, self.button_hover_image, (100, 40), self.back)
+
+    def load_buttons(self):
+        x, y = 124, 130  # 140
+        for available_level in range(self.available_levels):
+            self.level_buttons.new_special_button((x, y), self.button_image, self.button_hover_image if available_level+1 <= self.last_level_unlocked else self.button_image, self.button_size, self._get_level, (available_level+1, ))
+            x += self.button_size[0] + self.spacing_per_button
+            if x >= 500:
+                x = 124
+                y += self.button_size[1] + self.spacing_per_button
 
     @staticmethod
     def __quit__():
@@ -75,6 +82,17 @@ class LevelSelector:
             self.selected_level: int = number
             self.response = number
 
+    def draw_level_buttons(self):
+        for button in self.level_buttons.buttons:
+            if button.rect.collidepoint(pygame.mouse.get_pos()):
+                if button.args[0] <= self.last_level_unlocked:
+                    button.image_hover = self.buttons_unlocked_hovering[self.time//self.frames_per_sprite]
+                    self.time += 1
+                    if self.time >= self.frames_per_sprite*2:
+                        self.time = 0
+
+        self.level_buttons.update()
+
     def update(self):
         """
         it draws the level selector on the screen
@@ -85,16 +103,16 @@ class LevelSelector:
         for x in range(26):
             for y in range(25):
                 self.screen.blit(self.table, (x*32, y*28))
-        self.screen.blit(self.foreground_image, (50, 50))  # drawing the image that the buttons are going to be on
-        self.level_buttons.update()  # drawing all of the buttons
+        self.screen.blit(self.background_image, (0, 0))  # drawing the image that the buttons are going to be on
+        self.draw_level_buttons()
 
         # draw "level select" to the screen
         label = self.font_60.render("level select", True, (0, 0, 0))
-        self.screen.blit(label, (self.W//2 - label.get_width()//2, 100))
+        self.screen.blit(label, (self.W//2 - label.get_width()//2, 40))
 
         self.back_button.update(self.screen)  # draw the back button and the text for it
         label = self.font_40.render("back", True, (0, 0, 0))
-        self.screen.blit(label, (5 + self.back_button.rect[2]//2 - label.get_width()//2, 5 + self.back_button.rect[3]//2 - label.get_height()//2))
+        self.screen.blit(label, (self.W//2 - label.get_width()//2, self.H - 80 - label.get_height()//2))
 
         for button in self.level_buttons.buttons:  # draw the numbers of the buttons and if needed the cross to tell the player that those levels aren't unlocked yet
             label = self.font_40.render(str(button.args[0]), True, (0, 0, 0))

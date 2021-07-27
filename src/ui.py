@@ -8,7 +8,7 @@ class UI:
         self.time_left: int = 0
         self.fps: int = fps
         self.clock_animation: animation.Animation = animation.Animation(
-            535, 5, [load_alpha(f"data/assets/clock/clock{i+1}.png") for i in range(8)], 3
+            544, 6, [load_alpha(f"data/assets/clock/clock{i+1}.png") for i in range(8)], 3
         )
 
     def reset(self, time_for_level):

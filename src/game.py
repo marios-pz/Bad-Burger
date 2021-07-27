@@ -14,8 +14,8 @@ class Game:
     def __init__(self):
 
         # ------------------- SCREEN VARIABLES ----------------------------- #
-        self.w, self.h = 640, 480
-        self.screen = pg.display.set_mode((self.w, self.h), pg.SCALED)
+        self.W, self.H = 640, 480
+        self.screen = pg.display.set_mode((self.W, self.H), pg.SCALED)
 
         # ------------------- GAME STATE VARIABLES ------------------------- #
         self.running: bool = True
@@ -25,9 +25,12 @@ class Game:
 
         # --------------- VARIABLES ---------------------------------------- #
         self.settings = get_json("src/settings")
+        self.clock_ui: pg.surface.Surface = load_alpha("data/assets/clock/clock_ui.png")
         self.font_60: pg.font.Font = pg.font.Font(None, 60)
         self.font_50: pg.font.Font = pg.font.Font(None, 50)
         self.font_40: pg.font.Font = pg.font.Font(None, 40)
+        self.font_30: pg.font.Font = pg.font.Font(None, 30)
+        self.font_20: pg.font.Font = pg.font.Font(None, 20)
         self.last_time: float = time.time()
         self.dt: float = None
 
@@ -164,8 +167,9 @@ class Game:
 
             self.update_player_and_tiles()
 
-            label = self.font_40.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
-            self.screen.blit(label, (self.settings["WIDTH"] - label.get_width() - 5, 5))
+            self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
+            label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
+            self.screen.blit(label, (self.W - label.get_width() - 13, 10))
             if self.ui.get_time():
                 self.ui.clock_animation.animate()
             self.ui.clock_animation.update(self.screen)
