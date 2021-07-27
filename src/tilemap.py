@@ -29,10 +29,14 @@ class TileMap:
         self.TLS_X = self.TILE_SIZE[0]  # tile size x shortcut
         self.TLS_Y = self.TILE_SIZE[1]  # tile size y shortcut
 
-        self.read_map("map", False)
-        self.read_map("map_collider", True)
+        self.read_map("data/map.txt", False)
+        """self.read_map("map_collider", True)"""
 
         self.current_map_collider = "map_collider"
+
+    def init_level(self, level):
+        self.current_map_collider = level.path
+        self.read_map(self.current_map_collider, True)
 
     def read_map(self, name, collider):
         
@@ -42,7 +46,7 @@ class TileMap:
             self.ground_tiles = []
 
         # get the doc
-        with open(f"data/{name}.txt", "r") as f:
+        with open(name, "r") as f:
             datas = f.readlines()  # read the content
 
         # loop through it

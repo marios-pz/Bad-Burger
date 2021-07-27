@@ -6,6 +6,7 @@ import src.ui as ui
 import src.tilemap as tilemap
 import src.player as player
 import src.menu as menu
+import src.levels as lvl
 
 
 class Game:
@@ -41,6 +42,19 @@ class Game:
 
         self.player = player.Player(self.tile_map, self.screen)
 
+        self.levels = [
+            lvl.Level1,
+            lvl.Level2,
+            lvl.Level3,
+            lvl.Level4,
+            lvl.Level5,
+            lvl.Level6,
+            lvl.Level7,
+            lvl.Level8,
+            lvl.Level9,
+            lvl.Level10
+        ]
+
     @staticmethod
     def __quit__():
         # quit the entire program
@@ -50,7 +64,9 @@ class Game:
     def __returnToMenu__(self):  # start running the menu
         self.running_game, self.running_menu, self.running_level_selector = False, True, False
 
-    def __startGame__(self):  # start running the game
+    def __startGame__(self, level):  # start running the game
+        self.player.init_level(self.levels[level-1])
+        self.tile_map.init_level(self.levels[level-1])
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
 
     def __startLevelSelector__(self):  # it starts the level selector
@@ -67,7 +83,7 @@ class Game:
             self.__returnToMenu__()
             return
         elif isinstance(response, int):
-            self.__startGame__()
+            self.__startGame__(self.level_selector.selected_level)
         # print(self.level_selector.selected_level) it will print the level that the player chose to play
 
     def show_above_player(self):

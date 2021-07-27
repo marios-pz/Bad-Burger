@@ -15,7 +15,7 @@ class Player:
         self.surface = resize(load_alpha("data/assets/walk_right/Sprite-0007.png"), (32, 32))
 
         self.player_grid = []
-        self.read_map(self.tile_map.current_map_collider)
+        "self.read_map(self.tile_map.current_map_collider)"
         self.index = [0, 0]
 
         # rect
@@ -44,9 +44,14 @@ class Player:
 
         self.moving_anim_left = [p.transform.flip(img, True, False) for img in self.moving_anim_right]
 
+    def init_level(self, level):
+        self.index = level.begin_player_pos
+        self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
+        self.read_map(level.path)
+
     def read_map(self, name):
 
-        with open(f"data/{name}.txt", "r") as f:
+        with open(name, "r") as f:
             datas = f.readlines()
 
         '''
