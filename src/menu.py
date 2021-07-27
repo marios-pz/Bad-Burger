@@ -4,7 +4,6 @@ import pygame
 from .ratatouille import *
 import random
 from .utils import *
-import os
 import time
 
 
@@ -21,8 +20,10 @@ class Menu:
         self.logo: pygame.surface.Surface = load_alpha("data/assets/logo.png")
         self.music_on: pygame.surface.Surface = load_alpha("data/assets/music_on.png")
         self.music_off: pygame.surface.Surface = load_alpha("data/assets/music_off.png")
+        self.table: pygame.surface.Surface = load_alpha("data/assets/table.png")
         self.sfx_on: pygame.surface.Surface = load_alpha("data/assets/sfx_on.png")
         self.sfx_off: pygame.surface.Surface = load_alpha("data/assets/sfx_off.png")
+        self.button_image = load_alpha("data/assets/button.png")
         self.running: bool = True
         self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
         self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
@@ -35,13 +36,12 @@ class Menu:
         self.fake_players: list = [_FakePlayer(0 + -100*i, random.randint(270, 370), 10) for i in range(7)]
 
         # -------------------------- BUTTONS ---------------------------- #
-        self.button_image = load_alpha("data/assets/button.png")
 
         self.buttons: FrameWork = init(self.screen)
         self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_image, (100, 40), self.stop_running)  # play
         self.buttons.new_special_button((self.W // 2 - 160 // 2, self.H // 2 - 50 // 2 + 125), self.button_image, self.button_image, (160, 40))  # settings
         self.buttons.new_special_button((self.W // 2 - 140 // 2, self.H // 2 - 50 // 2 + 170), self.button_image, self.button_image, (140, 40), self.switch_credits)  # credits
-        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 215), self.button_image, self.button_image, (100, 40),  self.quit)  # quit
+        self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 215), self.button_image, self.button_image, (100, 40),  self.__quit__)  # quit
 
         self.credits_back: SpecialButton = SpecialButton((5, 5), self.button_image, self.button_image, (100, 40), self.switch_credits)
         self.start_menu: SpecialButton = SpecialButton((self.W // 2 - 170 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_image, (170, 40), self.toggle_clicked_first_button)
@@ -54,7 +54,7 @@ class Menu:
         self.clicked_first_button = not self.clicked_first_button
 
     @staticmethod
-    def quit():
+    def __quit__():
         reset_settings()
         pygame.quit()
         quit(-1)
@@ -85,7 +85,10 @@ class Menu:
 
     def draw(self):
         self.screen.fill((255, 100, 50))
-        self.screen.blit(load_alpha("data/assets/bg.png"), (0, 0))
+        for x in range(26):
+            for y in range(25):
+                self.screen.blit(self.table, (x*32, y*28))
+
         for fake_player in self.fake_players:
             fake_player.move(self.dt)
             fake_player.animate()
@@ -152,6 +155,7 @@ class Menu:
                 quit(-1)
  
     def run(self, fps):
+        self.running = True
         while self.running:
             self.clock.tick(fps)
             self.dt = time.time() - self.last_time
@@ -166,26 +170,37 @@ class _FakePlayer:
     def __init__(self, x: int, y: int, vel: int):
         self.x = x
         self.y = y
-        self.walking_right_animation = cycle([load_alpha(f"""data/assets/walk_right/{filename}""") for filename in os.listdir("data/assets/walk_right/")])
+        self.walking_right_animation = cycle(
+            [
+                pg.transform.scale2x(
+                    load_alpha(
+                        f"data/assets/walk_right/sprite-00{i if i > 9 else f'0{i}'}.png"
+                    )
+                ) for i in range(
+                    7, 14
+                )
+            ]
+        )
         self.vel = vel
         self.jump_count = 10
         self.is_jumping = False
         self.frames_per_image = 2
         self.time = 0
         self.settings = get_json("src/settings")
-        self.current_image = next(self.walking_right_animation)
+        for _ in range(random.randint(1, 15)):
+            self.current_image = next(self.walking_right_animation)
 
     def move(self, dt):
         if self.x >= 0:
             if self.is_jumping:
                 if self.jump_count >= -10:
-                    self.y -= (self.jump_count * abs(self.jump_count)) / 2
+                    self.y -= ((self.jump_count * abs(self.jump_count)) / 2)*dt
                     self.jump_count -= 1
                 else:
                     self.jump_count = 10
                     self.is_jumping = False
 
-        if random.randint(0, 1000) > 800 and not self.is_jumping:
+        if random.randint(0, 1000) > 900 and not self.is_jumping:
             self.is_jumping = True
 
         self.x += self.vel*dt

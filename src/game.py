@@ -1,6 +1,7 @@
 import pygame as pg
 from src.utils import *
 import time
+import src.level_selector as level_selector
 import src.tilemap as tilemap
 import src.player as player
 import src.menu as menu
@@ -18,20 +19,22 @@ class Game:
         self.running: bool = True
         self.running_menu: bool = True
         self.running_game: bool = False
+        self.running_level_selector: bool = False
+
+        # --------------- VARIABLES ---------------------------------------- #
+        self.settings = get_json("src/settings")
+        self.last_time: float = time.time()
+        self.dt: float = None
 
         # ------------------- TILE MAP ------------------------------------- #
         self.tile_map = tilemap.TileMap(self.screen, 32)
 
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
+        self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
 
         self.player = player.Player(self.tile_map, self.screen)
-
-        # --------------- VARIABLES ---------------------------------------- #
-        self.settings = get_json("src/settings")
-        self.last_time: float = time.time()
-        self.dt: float = None
 
     @staticmethod
     def __quit__():
@@ -39,16 +42,28 @@ class Game:
         pg.quit()
         raise SystemExit
 
-    def __returnToMenu__(self): # return from the game to the menu
-        self.running_game, self.running_menu = False, True
+    def __returnToMenu__(self):  # start running the menu
+        self.running_game, self.running_menu, self.running_level_selector = False, True, False
 
-    def __startGame__(self): # go from the menu to the game
-        self.running_game, self.running_menu = True, False
+    def __startGame__(self):  # start running the game
+        self.running_game, self.running_menu, self.running_level_selector = True, False, False
+
+    def __startLevelSelector__(self):  # it starts the level selector
+        self.running_game, self.running_menu, self.running_level_selector = False, False, True
 
     def run_menu(self):
         self.menu.run(self.settings["FPS"])
-        self.__startGame__()
+        self.__startLevelSelector__()
         self.settings = get_json("src/settings")
+
+    def run_level_selector(self):
+        response = self.level_selector.run(self.settings["FPS"])
+        if response == "back":
+            self.__returnToMenu__()
+            return
+        elif isinstance(response, int):
+            self.__startGame__()
+        # print(self.level_selector.selected_level) it will print the level that the player chose to play
 
     def show_above_player(self):
         grid = self.player.player_grid
@@ -130,9 +145,15 @@ class Game:
 
     def run(self):
         while self.running:
+
             if self.running_menu:
                 self.run_menu()
+
+            elif self.running_level_selector:
+                self.run_level_selector()
+
             elif self.running_game:
                 self.run_game()
+
             else:
                 self.__quit__()
