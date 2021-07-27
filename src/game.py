@@ -163,8 +163,12 @@ class Game:
             self.screen.fill((255, 255, 255))
 
             self.update_player_and_tiles()
+
             label = self.font_40.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
-            self.screen.blit(label, (5, self.settings["HEIGHT"] - label.get_height() - 5))
+            self.screen.blit(label, (self.settings["WIDTH"] - label.get_width() - 5, 5))
+            if self.ui.get_time():
+                self.ui.clock_animation.animate()
+            self.ui.clock_animation.update(self.screen)
 
             pg.display.update()
 

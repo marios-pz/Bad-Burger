@@ -1,4 +1,5 @@
 import pygame
+import src.animation as animation
 from .utils import *
 
 
@@ -6,6 +7,9 @@ class UI:
     def __init__(self, fps: int):
         self.time_left: int = 0
         self.fps: int = fps
+        self.clock_animation: animation.Animation = animation.Animation(
+            535, 5, [load_alpha(f"data/assets/clock/clock{i+1}.png") for i in range(8)], 3
+        )
 
     def reset(self, time_for_level):
         self.time_left: int = time_for_level
