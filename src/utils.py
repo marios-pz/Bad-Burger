@@ -38,24 +38,3 @@ def write_json(path: str, DATA: dict, indent: int = 4):
     with open(f"{path}.json", "w") as f:
         f.truncate(0)
         json.dump(DATA, f, indent=indent)
-
-
-def reset_settings():
-    data = {
-        "WIDTH": 640,
-        "HEIGHT": 480,
-        "FPS": 30,
-        "credits": [
-            "credits",
-            "programing:",
-            "emc235 | fkS | Mario | hk",
-            "art:",
-            "Mario | hk",
-            "music:",
-            "Mario | hk | fkS"
-        ],
-        "play_music": True,
-        "play_sfx": True
-    }
-
-    write_json("src/settings", data)

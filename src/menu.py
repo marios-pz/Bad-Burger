@@ -33,7 +33,7 @@ class Menu:
         self.clicked_first_button: bool = False
         self.last_time: float = time.time()
         self.dt: float = None
-        self.fake_players: list = [_FakePlayer(0 + -100*i, random.randint(270, 370), 10) for i in range(7)]
+        self.fake_players: list = [_FakePlayer(0 + -100*i, random.randint(270, 370), 10, self.settings) for i in range(7)]
 
         # -------------------------- BUTTONS ---------------------------- #
 
@@ -47,15 +47,14 @@ class Menu:
         self.start_menu: SpecialButton = SpecialButton((self.W // 2 - 170 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_image, (170, 40), self.toggle_clicked_first_button)
 
         self.sound_buttons: FrameWork = init(self.screen)
-        self.sound_buttons.new_special_button((self.W - 35, 5), self.music_on, self.music_on, (32, 32), self.toggle_sounds)
-        self.sound_buttons.new_special_button((self.W - 67, 4), self.sfx_on, self.sfx_on, (32, 32), self.toggle_sfx)
+        self.sound_buttons.new_special_button((self.W - 35, 5), self.music_on if self.settings["play_music"] else self.music_off, self.music_on if self.settings["play_music"] else self.music_off, (32, 32), self.toggle_sounds)
+        self.sound_buttons.new_special_button((self.W - 67, 4), self.sfx_on if self.settings["play_sfx"] else self.sfx_off, self.sfx_on if self.settings["play_sfx"] else self.sfx_off, (32, 32), self.toggle_sfx)
 
     def toggle_clicked_first_button(self):
         self.clicked_first_button = not self.clicked_first_button
 
-    @staticmethod
-    def __quit__():
-        reset_settings()
+    def __quit__(self):
+        write_json("src/settings", self.settings)
         pygame.quit()
         quit(-1)
 
@@ -150,9 +149,7 @@ class Menu:
 
             self.sound_buttons.handle_events(event)
             if event.type == pygame.QUIT:
-                reset_settings()
-                pygame.quit()
-                quit(-1)
+                self.__quit__()
  
     def run(self, fps):
         self.running = True
@@ -167,7 +164,7 @@ class Menu:
 
 
 class _FakePlayer:
-    def __init__(self, x: int, y: int, vel: int):
+    def __init__(self, x: int, y: int, vel: int, settings: dict):
         self.x = x
         self.y = y
         self.walking_right_animation = cycle(
@@ -186,7 +183,7 @@ class _FakePlayer:
         self.is_jumping = False
         self.frames_per_image = 2
         self.time = 0
-        self.settings = get_json("src/settings")
+        self.settings = settings
         for _ in range(random.randint(1, 15)):
             self.current_image = next(self.walking_right_animation)
 

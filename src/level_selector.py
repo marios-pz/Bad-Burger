@@ -55,7 +55,6 @@ class LevelSelector:
         it quits the program
         :return: None
         """
-        reset_settings()
         pygame.quit()
         quit(-1)
 
