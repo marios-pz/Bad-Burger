@@ -1,7 +1,8 @@
-import pygame as pg
 from src.utils import *
+import pygame as pg
 import time
 import src.level_selector as level_selector
+import src.ui as ui
 import src.tilemap as tilemap
 import src.player as player
 import src.menu as menu
@@ -23,6 +24,9 @@ class Game:
 
         # --------------- VARIABLES ---------------------------------------- #
         self.settings = get_json("src/settings")
+        self.font_60: pg.font.Font = pg.font.Font(None, 60)
+        self.font_50: pg.font.Font = pg.font.Font(None, 50)
+        self.font_40: pg.font.Font = pg.font.Font(None, 40)
         self.last_time: float = time.time()
         self.dt: float = None
 
@@ -31,6 +35,7 @@ class Game:
 
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
+        self.ui: ui.UI = ui.UI(self.settings["FPS"])
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
 
@@ -120,8 +125,10 @@ class Game:
                     self.player.reset_ice_blocks(update_tl_map_col)
 
     def run_game(self):
+        self.ui.reset(120)
         while self.running_game:
             self.clock.tick(self.settings["FPS"])
+            self.ui.tick()
             self.dt = time.time() - self.last_time
             self.dt *= 60
             self.last_time = time.time()
@@ -140,6 +147,8 @@ class Game:
             self.screen.fill((255, 255, 255))
 
             self.update_player_and_tiles()
+            label = self.font_40.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
+            self.screen.blit(label, (5, self.settings["HEIGHT"] - label.get_height() - 5))
 
             pg.display.update()
 
