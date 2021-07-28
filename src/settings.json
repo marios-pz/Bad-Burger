@@ -11,6 +11,6 @@
         "music:",
         "Mario | hk | fkS"
     ],
-    "play_music": false,
-    "play_sfx": false
+    "play_music": true,
+    "play_sfx": true
 }

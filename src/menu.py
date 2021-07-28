@@ -40,7 +40,7 @@ class Menu:
 
         self.buttons: FrameWork = init(self.screen)
         self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 80), self.button_image, self.button_hover_image, (100, 40), self.stop_running)  # play
-        self.buttons.new_special_button((self.W // 2 - 160 // 2, self.H // 2 - 50 // 2 + 125), self.button_image, self.button_hover_image, (160, 40))  # settings
+        self.buttons.new_special_button((self.W // 2 - 110 // 2, self.H // 2 - 50 // 2 + 125), self.button_image, self.button_hover_image, (110, 40))  # help
         self.buttons.new_special_button((self.W // 2 - 140 // 2, self.H // 2 - 50 // 2 + 170), self.button_image, self.button_hover_image, (140, 40), self.switch_credits)  # credits
         self.buttons.new_special_button((self.W // 2 - 100 // 2, self.H // 2 - 50 // 2 + 215), self.button_image, self.button_hover_image, (100, 40),  self.__quit__)  # quit
 
@@ -118,7 +118,7 @@ class Menu:
                 self.screen.blit(label,
                                  (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 75))
 
-                label = self.font_40.render("settings", True, (0, 0, 0))
+                label = self.font_40.render("help", True, (0, 0, 0))
                 self.screen.blit(label,
                                  (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 120))
 
