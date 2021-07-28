@@ -16,7 +16,7 @@ class TileMap:
 
         # dict to assign a key to a tile
         self.keys = {
-            "0": tiles.GroundTiles.Grass,
+            "0": tiles.GroundTiles.Floor,
             "1": tiles.GroundTiles.Rock
         }
 
@@ -55,6 +55,7 @@ class TileMap:
         for index_r, row in enumerate(datas):
             # remove \n in the line
             row = row.strip()
+            row = row.replace(" ", "")
             if collider:
                 row_ = []
             for index_c, col in enumerate(row):
