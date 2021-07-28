@@ -28,7 +28,7 @@ class LevelSelector:
         self.font_40: pygame.font.Font = pygame.font.Font(None, 40)
         self.clock: pygame.time.Clock = clock
         self.table: pygame.surface.Surface = load_alpha("data/assets/table.png")
-        self.level_not_available: pygame.surface.Surface = resize(load_alpha("data/assets/level_not_available.png"), self.button_size)
+        self.level_not_available_scaled: pygame.surface.Surface = resize(load_alpha("data/assets/level_not_available.png"), (35, 45))
         self.background_image = pygame.transform.scale(load_alpha("data/assets/credits-background.png"), (self.W, self.H))
         self.button_image = load_alpha("data/assets/button.png")
         self.button_hover_image = load_alpha("data/assets/button_hover.png")
@@ -118,7 +118,11 @@ class LevelSelector:
             label = self.font_40.render(str(button.args[0]), True, (0, 0, 0))
             self.screen.blit(label, (button.rect[0] + self.button_size[0]//2 - label.get_width()//2, button.rect[1] + self.button_size[1]//2 - label.get_height()//2))
             if button.args[0] > self.last_level_unlocked:
-                self.screen.blit(self.level_not_available, button.rect)
+                self.screen.blit(self.level_not_available_scaled, (
+                    button.rect.x + button.rect.w//2 - self.level_not_available_scaled.get_width()//2,
+                    button.rect.y + (self.button_size[1] - self.level_not_available_scaled.get_height())
+                                                                   )
+                                 )
 
         pygame.display.update()
 
