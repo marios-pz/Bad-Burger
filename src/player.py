@@ -12,7 +12,7 @@ class Player:
         self.tile_map, self.TLS_X, self.TLS_Y, self.TILE_SIZE = tile_map, tile_map.TLS_X, tile_map.TLS_Y, tile_map.TILE_SIZE
 
         # image
-        self.surface = resize(load_alpha("data/assets/walk_right/Sprite-0007.png"), (32, 32))
+        self.surface = resize(load_alpha("data/assets/walk_left/walk_left1.png"), (32, 32))
 
         self.player_grid = []
         "self.read_map(self.tile_map.current_map_collider)"
@@ -32,8 +32,8 @@ class Player:
         self.began_casting_spell = 0
         self.delay_anim = 0
 
-        self.moving_anim_right = [load_alpha(f"data/assets/walk_right/{file}") for file in listdir("data/assets/walk_right")]
-        self.moving_anim_right = [resize(img, (32, 32)) for img in self.moving_anim_right]
+        self.moving_anim_left = [load_alpha(f"data/assets/walk_left/{file}") for file in listdir("data/assets/walk_left")]
+        self.moving_anim_left = [resize(img, (32, 32)) for img in self.moving_anim_left]
         self.index_anim = 0
         
         self.moving_anim_down = [load_alpha(f"data/assets/walk_down/{file}") for file in listdir("data/assets/walk_down")]
@@ -42,7 +42,14 @@ class Player:
         self.moving_anim_up = [load_alpha(f"data/assets/walk_up/{file}") for file in listdir("data/assets/walk_up")]
         self.moving_anim_up = [resize(img, (32, 32)) for img in self.moving_anim_up]
 
-        self.moving_anim_left = [p.transform.flip(img, True, False) for img in self.moving_anim_right]
+        self.moving_anim_right = [p.transform.flip(img, True, False) for img in self.moving_anim_left]
+
+        self.idle_left = [load_alpha(f"data/assets/idle_left/{file}") for file in listdir("data/assets/idle_left")]
+        self.idle_up = [load_alpha(f"data/assets/idle_up/{file}") for file in listdir("data/assets/idle_up")]
+        self.idle_down = [load_alpha(f"data/assets/idle_down/{file}") for file in listdir("data/assets/idle_down")]
+        self.idle_right = [p.transform.flip(img, True, False) for img in self.idle_left]
+
+        self.kick_animation = [load_alpha(f"data/assets/attack/{file}") for file in listdir("data/assets/attack")]
 
     def init_level(self, level):
         self.index = copy.copy(level.begin_player_pos)
@@ -65,7 +72,9 @@ class Player:
         self.player_grid = []
         for row in datas:
             row = row.strip()
+            row = row.replace(" ", "")
             line = []
+            print(row)
             for col in row:
                 if col == "1" or col == "2" or col == "3":
                     line.append(1)
@@ -108,6 +117,7 @@ class Player:
         is_ice = self.check_ice_block(next_cell)
         self.casting_spell = True
         self.began_casting_spell = p.time.get_ticks()
+
         if is_ice[0]:
             self.spell_ice(next_cell, True)
         else:
@@ -158,8 +168,9 @@ class Player:
                 
                 is_available = self.is_blank(first_cell)
 
+            print(first_cell, end=",")
             count += 1
-
+        print("end")
         return indexes if not destruct else None
 
     def check_ice_block(self, index: tuple[int, int]):
@@ -275,6 +286,44 @@ class Player:
                     self.surface = self.moving_anim_left[self.index_anim]
                     self.rect = self.surface.get_rect(center=self.rect.center)
 
+    def animate_idle(self):
+        self.current_time = p.time.get_ticks()
+
+        if self.current_time - self.delay_anim > 150:
+                self.delay_anim = self.current_time
+                self.index_anim = (self.index_anim + 1) % len(self.idle_right)
+
+                if self.direction == "right":
+
+                    self.surface = self.idle_right[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "down":
+
+                    self.surface = self.idle_down[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "up":
+
+                    self.surface = self.idle_up[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+                elif self.direction == "left":
+                    
+                    self.surface = self.idle_left[self.index_anim]
+                    self.rect = self.surface.get_rect(center=self.rect.center)
+
+    def animate_attack(self):
+        self.current_time = p.time.get_ticks()
+
+        if self.current_time - self.delay_anim > 500 / 8:
+            self.delay_anim = self.current_time
+            self.index_anim = (self.index_anim + 1) % len(self.kick_animation)
+
+            self.surface = self.kick_animation[self.index_anim]
+            self.rect = self.surface.get_rect(center=self.rect.center)
+
+
     def update(self, dt):
         # update current time
         self.current_time = p.time.get_ticks()
@@ -290,30 +339,37 @@ class Player:
 
             if self.current_time - self.began_casting_spell > 500:
                 self.casting_spell = False
+                self.direction = "down"
 
-            # PUT HERE THE ANIMATION OF THE CASTING SPELL
+            self.animate_attack()
 
         else:
-            pass
+            
+            self.animate_idle()
             # PUT HERE HIS WAITING ANIMATION
 
         # draw the player
         self.screen.blit(self.surface, self.rect)
 
-        # get keys pressed
-        pressed = p.key.get_pressed()
-        if pressed[p.K_LEFT]:
-            self.animate()
-            self.move_left()
-        elif pressed[p.K_RIGHT]:
-            self.animate()
-            self.move_right()
-        elif pressed[p.K_DOWN]:
-            self.animate()
-            self.move_down()
-        elif pressed[p.K_UP]:
-            self.animate()
-            self.move_up()
+        if not self.casting_spell:
+            # get keys pressed
+            pressed = p.key.get_pressed()
+            if pressed[p.K_LEFT]:
+                self.animate()
+                self.move_left()
+            elif pressed[p.K_RIGHT]:
+                self.animate()
+                self.move_right()
+            elif pressed[p.K_DOWN]:
+                self.animate()
+                self.move_down()
+            elif pressed[p.K_UP]:
+                self.animate()
+                self.move_up()
 
-        #pg.draw.rect(self.screen, (255, 0, 0), self.rect)
+        # DEBUG MODE :
+        """for index, row in enumerate(self.player_grid):
+            for index2, col in enumerate(row):
+                if col == 1:
+                    pg.draw.rect(self.screen, (255, 0, 0), [index2*32, index*32, 32, 32])"""
 
