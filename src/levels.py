@@ -6,13 +6,13 @@ class Level1:
 
 class Level2:
 
-    begin_player_pos = [1, 1]
+    begin_player_pos = [2, 2]
     path = "data/level-maps/level2.txt"
     enemies = []
 
 class Level3:
 
-    begin_player_pos = [0, 0]
+    begin_player_pos = [2, 2]
     path = "data/level-maps/level3.txt"
     enemies = []
 

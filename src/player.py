@@ -16,7 +16,7 @@ class Player:
 
         self.player_grid = []
         "self.read_map(self.tile_map.current_map_collider)"
-        self.index = [0, 0]
+        self.index = [1, 1]
 
         # rect
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
@@ -45,7 +45,7 @@ class Player:
         self.moving_anim_left = [p.transform.flip(img, True, False) for img in self.moving_anim_right]
 
     def init_level(self, level):
-        self.index = level.begin_player_pos
+        self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
         self.read_map(level.path)
 
@@ -67,7 +67,10 @@ class Player:
             row = row.strip()
             line = []
             for col in row:
-                line.append(0) if col == "0" else line.append(1)
+                if col == "1" or col == "2" or col == "3":
+                    line.append(1)
+                else:
+                    line.append(0)
             self.player_grid.append(line)
         
     def handle_events(self, event):
@@ -86,19 +89,19 @@ class Player:
     def cast_spell(self):
 
         if self.direction == "down":
-            if self.index[1]+1 > len(self.player_grid):
+            if self.index[1]+1 > len(self.player_grid)-1:
                 return
             next_cell = [self.index[0], self.index[1]+1]
         elif self.direction == "up":
-            if self.index[1] - 1 < 0:
+            if self.index[1] - 1 < 1:
                 return
             next_cell = [self.index[0], self.index[1]-1]
         elif self.direction == "right":
-            if self.index[0] + 1 > len(self.player_grid[self.index[1]]):
+            if self.index[0] + 1 > len(self.player_grid[self.index[1]])-1:
                 return
             next_cell = [self.index[0]+1, self.index[1]]
         elif self.direction == "left":
-            if self.index[0] - 1 < 0:
+            if self.index[0] - 1 < 1:
                 return
             next_cell = [self.index[0]-1, self.index[1]]
 
@@ -197,25 +200,25 @@ class Player:
 
     def coll_right(self):
         id_x, id_y = self.index
-        if id_x + 1 > len(self.player_grid[id_y]) or self.player_grid[id_y][id_x+1] == 1:
+        if id_x + 1 > len(self.player_grid[id_y])-2 or self.player_grid[id_y][id_x+1] == 1:
             return True
         return False
 
     def coll_left(self):
         id_x, id_y = self.index  
-        if id_x - 1 < 0 or self.player_grid[id_y][id_x-1] == 1:
+        if id_x - 1 < 1 or self.player_grid[id_y][id_x-1] == 1:
             return True
         return False
 
     def coll_up(self):
         id_x, id_y = self.index
-        if id_y - 1 < 0 or self.player_grid[id_y-1][id_x] == 1:
+        if id_y - 1 < 1 or self.player_grid[id_y-1][id_x] == 1:
             return True
         return False
 
     def coll_down(self):
         id_x, id_y = self.index
-        if id_y + 1 > len(self.player_grid) or self.player_grid[id_y+1][id_x] == 1:
+        if id_y + 1 > len(self.player_grid)-2 or self.player_grid[id_y+1][id_x] == 1:
             return True
         return False
 

@@ -21,7 +21,9 @@ class TileMap:
         }
 
         self.keys_collider = {
-            "1": tiles.ColliderTiles.IceBlock
+            "1": tiles.ColliderTiles.IceBlock,
+            "2": tiles.ColliderTiles.Furnace,
+            "3": tiles.ColliderTiles.Table
         }
 
         # TILE SIZE

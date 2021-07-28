@@ -73,3 +73,29 @@ class ColliderTiles:
             else:
                 self.screen.blit(self.image, self.rect)
             return None, None
+
+
+    class Furnace:
+
+        def __init__(self, screen, size, coordinates, happening, delay_happening):
+
+            self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
+            self.image = load_alpha("data/assets/furnace.png")
+            self.rect = self.image.get_rect(bottomleft=coordinates+pg.Vector2(0, 32))
+
+        def update(self):
+            self.screen.blit(self.image, self.rect)
+            return None, None
+
+    
+    class Table:
+
+        def __init__(self, screen, size, coordinates, happening, delay_happening):
+
+            self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
+            self.image = load_alpha("data/assets/barrel.png")
+            self.rect = self.image.get_rect(bottomleft=coordinates+pg.Vector2(0, 32))
+
+        def update(self):
+            self.screen.blit(self.image, self.rect)
+            return None, None
