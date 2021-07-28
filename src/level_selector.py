@@ -28,7 +28,7 @@ class LevelSelector:
         self.font_40: pygame.font.Font = pygame.font.Font(None, 40)
         self.clock: pygame.time.Clock = clock
         self.table: pygame.surface.Surface = load_alpha("data/assets/table.png")
-        self.level_not_available_scaled: pygame.surface.Surface = resize(load_alpha("data/assets/level_not_available.png"), (35, 45))
+        self.level_not_available_scaled: pygame.surface.Surface = resize_ratio(load_alpha("data/assets/level_not_available.png"), (35, 45))
         self.background_image = pygame.transform.scale(load_alpha("data/assets/credits-background.png"), (self.W, self.H))
         self.button_image = load_alpha("data/assets/button.png")
         self.button_hover_image = load_alpha("data/assets/button_hover.png")
@@ -135,6 +135,8 @@ class LevelSelector:
             self.level_buttons.handle_events(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.back_button.handle_click(event.pos)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.back()
             elif event.type == pygame.QUIT:
                 self.__quit__()
 
