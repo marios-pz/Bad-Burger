@@ -41,11 +41,10 @@ class Game:
 
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
-        self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, (32, 32))
+        self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, self.tile_map.TILE_SIZE, (30, 30))
         self.ui: ui.UI = ui.UI(self.settings["FPS"])
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
-        
 
         self.player = player.Player(self.tile_map, self.screen)
         self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
