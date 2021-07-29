@@ -5,7 +5,7 @@ import src.enemies as enemies
 
 class EnemyManager:
 
-    def __init__(self, screen, player, tile_map):
+    def __init__(self, screen, player, tile_map, fruits):
         self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
 
         self.tile_map = tile_map
@@ -28,7 +28,7 @@ class EnemyManager:
         self.init_grid()
 
     def init_grid(self):
-        with open(self.level.path_frtuits[self.state], "r") as f:
+        with open(self.level.path_fruits[self.state], "r") as f:
             datas = f.readlines()
 
         self.fruits = []
