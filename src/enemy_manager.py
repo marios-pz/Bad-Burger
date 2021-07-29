@@ -10,10 +10,10 @@ class EnemyManager:
 
         self.tile_map = tile_map
 
-        self.fruits = []
-        self.enemies = [enemies.Enemy1(self.screen, player, tile_map, self.fruits, (1, 2)),
-                        enemies.Enemy1(self.screen, player, tile_map, self.fruits, (5, 6)),
-                        enemies.Enemy1(self.screen, player, tile_map, self.fruits, (10, 9))]
+        self.fruits = fruits
+        self.enemies = [enemies.Enemy1(self.screen, player, tile_map, self.fruits, (15, 5), "standard"),]
+        """enemies.Enemy1(self.screen, player, tile_map, self.fruits, (5, 6), "standard"),
+                        enemies.Enemy1(self.screen, player, tile_map, self.fruits, (10, 9), "standard")]"""
 
         self.level = None
         self.state = 0
