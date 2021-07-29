@@ -57,6 +57,11 @@ class Player:
         self.down_power = [load_alpha(f"data/assets/power_down/{file}") for file in listdir("data/assets/power_down")]
         self.destroying = False
 
+        self.cooldown = True
+        self.delay_cd = 0
+        self.duration = 0
+        self.cd_direction = self.direction
+
     def init_level(self, level):
         self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
@@ -96,7 +101,7 @@ class Player:
 
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
-                if not self.moving and not self.casting_spell:
+                if not self.moving and not self.casting_spell and not self.cooldown:
                     return self.cast_spell()    
                 else:
                     self.ordered_spell = True
@@ -179,6 +184,14 @@ class Player:
             print(first_cell, end=",")
             count += 1
         print("end")
+
+        self.cooldown = True
+        self.delay_cd = pg.time.get_ticks() + count * 100
+        self.cd_direction = self.direction
+        if destruct:
+            self.duration = 500
+        else:
+            self.duration = 100
         return indexes if not destruct else None
 
     def check_ice_block(self, index: tuple[int, int]):
@@ -359,6 +372,13 @@ class Player:
 
         # draw the player
         self.screen.blit(self.surface, self.rect)
+
+        if self.cooldown:
+            if self.cd_direction != self.direction:
+                self.cooldown = False
+
+            if self.current_time - self.delay_cd > self.duration:
+                self.cooldown = False
 
         if not self.casting_spell:
             # get keys pressed
