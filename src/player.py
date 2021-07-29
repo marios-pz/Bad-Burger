@@ -54,7 +54,7 @@ class Player:
     def init_level(self, level):
         self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
-        self.read_map(level.path)
+        self.read_map(level.path_map)
 
     def read_map(self, name):
 

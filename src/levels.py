@@ -1,58 +1,68 @@
 class Level1:
     begin_player_pos = [4, 5]
-    path = "data/level-maps/level1.txt"
+    path_map = "data/level-maps/level1/map.txt"
+    path_frtuits = "data/level-maps/level1/fruits.txt"
     enemies = []
 
 
 class Level2:
     begin_player_pos = [2, 3]
-    path = "data/level-maps/level2.txt"
+    path_map = "data/level-maps/level2/map.txt"
+    path_frtuits = "data/level-maps/level2/fruits.txt"
     enemies = []
 
 
 class Level3:
     begin_player_pos = [2, 2]
-    path = "data/level-maps/level3.txt"
+    path_map = "data/level-maps/level3/map.txt"
+    path_frtuits = "data/level-maps/level3/fruits.txt"
     enemies = []
 
 
 class Level4:
     begin_player_pos = [10, 5]
-    path = "data/level-maps/level4.txt"
+    path_map = "data/level-maps/level4/map.txt"
+    path_frtuits = "data/level-maps/level4/fruits.txt"
     enemies = []
 
 
 class Level5:
     begin_player_pos = [7, 8]
-    path = "data/level-maps/level5.txt"
+    path_map = "data/level-maps/level5/map.txt"
+    path_frtuits = "data/level-maps/level5/fruits.txt"
     enemies = []
 
 
 class Level6:
     begin_player_pos = [4, 5]
-    path = "data/level-maps/level6.txt"
+    path_map = "data/level-maps/level6/map.txt"
+    path_frtuits = "data/level-maps/level6/fruits.txt"
     enemies = []
 
 
 class Level7:
     begin_player_pos = [7, 7]
-    path = "data/level-maps/level7.txt"
+    path_map = "data/level-maps/level7/map.txt"
+    path_frtuits = "data/level-maps/level7/fruits.txt"
     enemies = []
 
 
 class Level8:
     begin_player_pos = [4, 5]
-    path = "data/level-maps/level8.txt"
+    path_map = "data/level-maps/level8/map.txt"
+    path_frtuits = "data/level-maps/level8/fruits.txt"
     enemies = []
 
 
 class Level9:
     begin_player_pos = [12, 7]
-    path = "data/level-maps/level9.txt"
+    path_map = "data/level-maps/level9/map.txt"
+    path_frtuits = "data/level-maps/level9/fruits.txt"
     enemies = []
 
 
 class Level10:
     begin_player_pos = [12, 3]
-    path = "data/level-maps/level10.txt"
+    path_map = "data/level-maps/level10/map.txt"
+    path_frtuits = "data/level-maps/level10/fruits.txt"
     enemies = []

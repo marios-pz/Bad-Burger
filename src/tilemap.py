@@ -37,7 +37,7 @@ class TileMap:
         self.current_map_collider = "map_collider"
 
     def init_level(self, level):
-        self.current_map_collider = level.path
+        self.current_map_collider = level.path_map
         self.read_map(self.current_map_collider, True)
 
     def read_map(self, name, collider):
