@@ -8,6 +8,7 @@ import src.tilemap as tilemap
 import src.player as player
 import src.menu as menu
 import src.levels as lvl
+import src.enemy_manager as enemy_manager
 
 
 class Game:
@@ -44,8 +45,10 @@ class Game:
         self.ui: ui.UI = ui.UI(self.settings["FPS"])
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
+        
 
         self.player = player.Player(self.tile_map, self.screen)
+        self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
 
         self.levels = [
             lvl.Level1,
@@ -73,6 +76,7 @@ class Game:
         self.player.init_level(self.levels[level-1])
         self.tile_map.init_level(self.levels[level-1])
         self.fruits.init_level(self.levels[level-1].path_fruits[0])  # it loads the first layer of fruits
+        self.enemy_manager.init_level(self.levels[level-1])
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
 
     def __startLevelSelector__(self):  # it starts the level selector
@@ -92,28 +96,6 @@ class Game:
             self.__startGame__(self.level_selector.selected_level)
         # print(self.level_selector.selected_level) it will print the level that the player chose to play
 
-    def show_above_player(self):
-        grid = self.player.player_grid
-
-        if self.player.index[1] + 1 < len(grid):
-            if self.player.index[0] - 1 >= 0:
-                cell1 = [self.player.index[0]-1, self.player.index[1]+1]
-                block = self.get_block(cell1)
-                if block is not None:
-                    return True
-
-            cell2 = [self.player.index[0], self.player.index[1]+1]
-            block = self.get_block(cell2)
-            if block is not None:
-                return True
-
-            if self.player.index[0] + 1 < len(grid[self.player.index[1]]):
-                cell3 = [self.player.index[0]+1, self.player.index[1]+1]
-                block = self.get_block(cell3)
-                if block is not None:
-                    return True
-        return False
-
     def get_block(self, index):
 
         for tiles in self.tile_map.collider_tiles:
@@ -128,25 +110,16 @@ class Game:
         self.tile_map.update_ground()
 
         self.fruits.update()
+        self.enemy_manager.update()
 
-        if not self.show_above_player():
-            update_tl_map_col = self.tile_map.update_colliders()
-            # check if there are blocks to remove from the player grid
-            if update_tl_map_col is not None:
-                self.player.reset_ice_blocks(update_tl_map_col)
+        update_pl = self.player.update(self.dt)
+        if update_pl is not None:
+            pass
 
-            update_pl = self.player.update(self.dt)
-            if update_pl is not None:
-                pass
-        else:
-            update_pl = self.player.update(self.dt)
-            if update_pl is not None:
-                pass
-
-            update_tl_map_col = self.tile_map.update_colliders()
-            # check if there are blocks to remove from the player grid
-            if update_tl_map_col is not None:
-                self.player.reset_ice_blocks(update_tl_map_col)
+        update_tl_map_col = self.tile_map.update_colliders()
+        # check if there are blocks to remove from the player grid
+        if update_tl_map_col is not None:
+            self.player.reset_ice_blocks(update_tl_map_col)
 
     def run_game(self):
         self.ui.reset(120)
