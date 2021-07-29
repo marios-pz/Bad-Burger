@@ -1,6 +1,7 @@
 from src.utils import *
 import pygame as pg
 import time
+import src.fruits as fruits
 import src.level_selector as level_selector
 import src.ui as ui
 import src.tilemap as tilemap
@@ -39,6 +40,7 @@ class Game:
 
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
+        self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, (32, 32))
         self.ui: ui.UI = ui.UI(self.settings["FPS"])
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
@@ -70,6 +72,7 @@ class Game:
     def __startGame__(self, level):  # start running the game
         self.player.init_level(self.levels[level-1])
         self.tile_map.init_level(self.levels[level-1])
+        self.fruits.init_level(self.levels[level-1].path_fruits[0])  # it loads the first layer of fruits
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
 
     def __startLevelSelector__(self):  # it starts the level selector
@@ -120,28 +123,30 @@ class Game:
                     if tile.rect.collidepoint(index[0]*self.tile_map.TLS_X, index[1]*self.tile_map.TLS_Y):
                         return tile
 
-    def update_player_and_tiles(self):
+    def update_player_fruits_tiles(self):
 
-            self.tile_map.update_ground()
+        self.tile_map.update_ground()
 
-            if not self.show_above_player():
-                update_tl_map_col = self.tile_map.update_colliders()
-                # check if there are blocks to remove from the player grid
-                if update_tl_map_col is not None:
-                    self.player.reset_ice_blocks(update_tl_map_col)
+        self.fruits.update()
 
-                update_pl = self.player.update(self.dt)
-                if update_pl is not None:
-                    pass
-            else:
-                update_pl = self.player.update(self.dt)
-                if update_pl is not None:
-                    pass
+        if not self.show_above_player():
+            update_tl_map_col = self.tile_map.update_colliders()
+            # check if there are blocks to remove from the player grid
+            if update_tl_map_col is not None:
+                self.player.reset_ice_blocks(update_tl_map_col)
 
-                update_tl_map_col = self.tile_map.update_colliders()
-                # check if there are blocks to remove from the player grid
-                if update_tl_map_col is not None:
-                    self.player.reset_ice_blocks(update_tl_map_col)
+            update_pl = self.player.update(self.dt)
+            if update_pl is not None:
+                pass
+        else:
+            update_pl = self.player.update(self.dt)
+            if update_pl is not None:
+                pass
+
+            update_tl_map_col = self.tile_map.update_colliders()
+            # check if there are blocks to remove from the player grid
+            if update_tl_map_col is not None:
+                self.player.reset_ice_blocks(update_tl_map_col)
 
     def run_game(self):
         self.ui.reset(120)
@@ -165,7 +170,7 @@ class Game:
 
             self.screen.fill((255, 255, 255))
 
-            self.update_player_and_tiles()
+            self.update_player_fruits_tiles()
 
             self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
             label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))

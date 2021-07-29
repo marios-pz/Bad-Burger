@@ -42,7 +42,7 @@ class ColliderTiles:
 
             self.image = load_alpha("data/assets/iceblock.png")
             # self.image = resize(self.image, size)
-            self.image.set_alpha(199)
+            self.image.set_alpha(180)
 
             self.rect = self.image.get_rect(bottomleft=coordinates + pg.Vector2(0, 32))
 
