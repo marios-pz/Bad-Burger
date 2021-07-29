@@ -51,6 +51,12 @@ class Player:
 
         self.kick_animation = [load_alpha(f"data/assets/attack/{file}") for file in listdir("data/assets/attack")]
 
+        self.right_power = [load_alpha(f"data/assets/ability_side/{file}") for file in listdir("data/assets/ability_side")]
+        self.left_power = [p.transform.flip(img, True, False) for img in self.right_power]
+
+        self.down_power = [load_alpha(f"data/assets/power_down/{file}") for file in listdir("data/assets/power_down")]
+        self.destroying = False
+
     def init_level(self, level):
         self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
@@ -119,8 +125,10 @@ class Player:
         self.began_casting_spell = p.time.get_ticks()
 
         if is_ice[0]:
+            self.destroying = True
             self.spell_ice(next_cell, True)
         else:
+            self.destroying = False
             return self.spell_ice(next_cell, False)
 
     def reset_ice_blocks(self, indexes: list):
@@ -263,28 +271,22 @@ class Player:
         self.current_time = p.time.get_ticks()
 
         if self.current_time - self.delay_anim > 75:
-                self.delay_anim = self.current_time
-                self.index_anim = (self.index_anim + 1) % len(self.moving_anim_right)
+            self.delay_anim = self.current_time
+            self.index_anim = (self.index_anim + 1) % len(self.moving_anim_right)
 
-                if self.direction == "right":
+            if self.direction == "right":
+                self.surface = self.moving_anim_right[self.index_anim]
 
-                    self.surface = self.moving_anim_right[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
+            elif self.direction == "down":
+                self.surface = self.moving_anim_down[self.index_anim]
 
-                elif self.direction == "down":
+            elif self.direction == "up":
+                self.surface = self.moving_anim_up[self.index_anim]
 
-                    self.surface = self.moving_anim_down[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
-
-                elif self.direction == "up":
-
-                    self.surface = self.moving_anim_up[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
-
-                elif self.direction == "left":
-                    
-                    self.surface = self.moving_anim_left[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
+            elif self.direction == "left":
+                self.surface = self.moving_anim_left[self.index_anim]
+            
+            self.rect = self.surface.get_rect(center=self.rect.center)
 
     def animate_idle(self):
         self.current_time = p.time.get_ticks()
@@ -294,34 +296,43 @@ class Player:
                 self.index_anim = (self.index_anim + 1) % len(self.idle_right)
 
                 if self.direction == "right":
-
                     self.surface = self.idle_right[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
 
                 elif self.direction == "down":
-
                     self.surface = self.idle_down[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
 
                 elif self.direction == "up":
-
                     self.surface = self.idle_up[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
 
                 elif self.direction == "left":
-                    
                     self.surface = self.idle_left[self.index_anim]
-                    self.rect = self.surface.get_rect(center=self.rect.center)
+                
+                self.rect = self.surface.get_rect(center=self.rect.center)
 
     def animate_attack(self):
         self.current_time = p.time.get_ticks()
 
         if self.current_time - self.delay_anim > 500 / 8:
             self.delay_anim = self.current_time
-            self.index_anim = (self.index_anim + 1) % len(self.kick_animation)
 
-            self.surface = self.kick_animation[self.index_anim]
-            self.rect = self.surface.get_rect(center=self.rect.center)
+            if self.destroying:
+
+                self.index_anim = (self.index_anim + 1) % len(self.kick_animation)
+                self.surface = self.kick_animation[self.index_anim]
+                self.rect = self.surface.get_rect(center=self.rect.center)
+            else:
+                self.index_anim = (self.index_anim + 1) % len(self.left_power)
+
+                if self.direction == "down":
+                    self.surface = self.down_power[self.index_anim]
+                elif self.direction == "left":
+                    self.surface = self.left_power[self.index_anim]
+                elif self.direction == "right":
+                    self.surface = self.right_power[self.index_anim]
+                elif self.direction == "up":
+                    self.surface = self.down_power[self.index_anim]
+                
+                self.rect = self.surface.get_rect(center=self.rect.center)
 
 
     def update(self, dt):
@@ -339,8 +350,6 @@ class Player:
 
             if self.current_time - self.began_casting_spell > 500:
                 self.casting_spell = False
-                self.direction = "down"
-
             self.animate_attack()
 
         else:
