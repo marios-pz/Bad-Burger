@@ -1,6 +1,7 @@
 import pygame as pg
 from src.utils import *
 import copy
+from os import listdir
 
 
 class GroundTiles:
@@ -53,14 +54,28 @@ class ColliderTiles:
             self.destructing = False
             self.cell = [0, 0]
 
+            self.destructing_anim = [load_alpha(f"data/assets/iceblock/{file}") for file in listdir("data/assets/iceblock")]
+            for img in self.destructing_anim:
+                img.set_alpha(128)
+            self.index_anim = 0
+            self.delay_anim = 0
+
         def destruct(self, cascade, cell):
             self.delay = pg.time.get_ticks() + cascade * 100
+            self.delay_anim = pg.time.get_ticks() + cascade * 100
             self.destructing = True
             self.cell = copy.copy(cell)
 
         def update(self):
             self.current_time = pg.time.get_ticks()
             if self.destructing:
+
+                if self.current_time - self.delay_anim > 500 / 6:
+                    self.index_anim += 1 if self.index_anim < len(self.destructing_anim)-1 else 0
+                    self.delay_anim = self.current_time
+                    self.image = self.destructing_anim[self.index_anim]
+                    self.rect = self.image.get_rect(center=self.rect.center)
+
                 if self.current_time - self.delay > 500:
                     return "kill", self.cell  # Else, we are playing a animation
 
