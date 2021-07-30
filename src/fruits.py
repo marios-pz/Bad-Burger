@@ -82,12 +82,22 @@ class FruitMap:
 
         self.paths = []
         self.state = 0
-        self.current_fruit = None
+        self.current_fruit = []
         
     def init_level(self, level):
         self.state = 0
         self.paths = [path for path in level.path_fruits]
         self.read_map(self.paths[self.state])
+        self.get_fruits()
+
+    def get_fruits(self):
+        self.current_fruit = []
+        for path in self.paths:
+            with open(path, "r") as f:
+                datas = f.read()
+            for key in self.keys:
+                if key in datas:
+                    self.current_fruit.append(copy(self.keys[key](self.screen, self.FRUIT_SIZE, (0,0)).image))
 
     def read_map(self, path):
         self.grid = []
@@ -103,8 +113,6 @@ class FruitMap:
 
                 for ic, fruit in enumerate(row):
                     if fruit in self.keys:
-                        self.current_fruit = copy(self.keys[fruit](self.screen, self.FRUIT_SIZE, (0, 0)))
-
                         self.grid[ir].append(self.keys[fruit](self.screen, self.FRUIT_SIZE, (
                             ic*self.TILE_W + (self.TILE_W - self.FRUIT_W)//2,
                             ir*self.TILE_H + (self.TILE_H - self.FRUIT_H)//2

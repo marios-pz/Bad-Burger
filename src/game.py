@@ -17,7 +17,7 @@ class Game:
 
         # ------------------- SCREEN VARIABLES ----------------------------- #
         self.W, self.H = 640, 480
-        self.screen = pg.display.set_mode((self.W, self.H), pg.SCALED)
+        self.screen = pg.display.set_mode((self.W, self.H), pg.SCALED | pg.FULLSCREEN)
 
         # ------------------- GAME STATE VARIABLES ------------------------- #
         self.running: bool = True
