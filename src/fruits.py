@@ -1,6 +1,7 @@
 from typing import List
 import pprint
 import pygame
+from pygame.display import update
 from src.utils import *
 
 
@@ -77,9 +78,14 @@ class FruitMap:
             "3": Fruits.Lemon,
             "4": Fruits.Grape
         }
+
+        self.paths = []
+        self.state = 0
         
-    def init_level(self, path):
-        self.read_map(path)
+    def init_level(self, level):
+        self.state = 0
+        self.paths = [path for path in level.path_fruits]
+        self.read_map(self.paths[self.state])
 
     def read_map(self, path):
         self.grid = []
@@ -102,8 +108,31 @@ class FruitMap:
                     else:
                         self.grid[ir].append(None)
 
+    def init_state(self):
+        if self.state >= len(self.paths)-1:
+            return "victory"
+        else:
+            self.state += 1
+            self.read_map(self.paths[self.state])
+            return "initialized next state"
+
     def update(self):
+        updated = False
         for _r in self.grid:
             for fruit in _r:
                 if fruit is not None:
+                    updated = True
                     fruit.update()
+
+        if not updated:
+            
+            init_ = self.init_state()
+            if init_ == "victory":
+                print(init_)
+                return "victory"
+        
+        print(self.state)
+        print(self.paths)
+
+        print("")
+        

@@ -6,10 +6,11 @@ from src.utils import *
 
 
 class Player:
-    def __init__(self, tile_map, screen):
+    def __init__(self, tile_map, fruits, screen):
 
         self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
         self.tile_map, self.TLS_X, self.TLS_Y, self.TILE_SIZE = tile_map, tile_map.TLS_X, tile_map.TLS_Y, tile_map.TILE_SIZE
+        self.fruits = fruits
 
         # image
         self.surface = resize(load_alpha("data/assets/walk_left/walk_left1.png"), (32, 32))
@@ -61,6 +62,9 @@ class Player:
         self.delay_cd = 0
         self.duration = 0
         self.cd_direction = self.direction
+
+    def eat_fruit(self):
+        self.fruits.grid[self.index[1]][self.index[0]] = None
 
     def init_level(self, level):
         self.index = copy.copy(level.begin_player_pos)
@@ -370,6 +374,7 @@ class Player:
             self.animate_idle()
             # PUT HERE HIS WAITING ANIMATION
 
+        self.eat_fruit()
         # draw the player
         self.screen.blit(self.surface, self.rect)
 

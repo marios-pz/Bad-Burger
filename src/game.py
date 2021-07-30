@@ -46,7 +46,7 @@ class Game:
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
 
-        self.player = player.Player(self.tile_map, self.screen)
+        self.player = player.Player(self.tile_map, self.fruits, self.screen)
         self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
 
         self.levels = [
@@ -74,7 +74,7 @@ class Game:
     def __startGame__(self, level):  # start running the game
         self.player.init_level(self.levels[level-1])
         self.tile_map.init_level(self.levels[level-1])
-        self.fruits.init_level(self.levels[level-1].path_fruits[0])  # it loads the first layer of fruits
+        self.fruits.init_level(self.levels[level-1])  # it loads the first layer of fruits
         self.enemy_manager.init_level(self.levels[level-1])
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
 
