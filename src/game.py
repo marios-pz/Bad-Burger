@@ -9,6 +9,7 @@ import src.player as player
 import src.menu as menu
 import src.levels as lvl
 import src.enemy_manager as enemy_manager
+import src.pause as pause
 
 
 class Game:
@@ -49,6 +50,9 @@ class Game:
         self.player = player.Player(self.tile_map, self.fruits, self.screen)
         self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
 
+        self.pausing = False
+        self.pause = pause.Pause(self.screen)
+
         self.levels = [
             lvl.Level1,
             lvl.Level2,
@@ -80,6 +84,9 @@ class Game:
 
     def __startLevelSelector__(self):  # it starts the level selector
         self.running_game, self.running_menu, self.running_level_selector = False, False, True
+
+    def set_pause_active(self):
+        self.pausing = not self.pausing
 
     def run_menu(self):
         self.menu.run(self.settings["FPS"])
@@ -139,29 +146,45 @@ class Game:
             self.dt *= 60
             self.last_time = time.time()
 
-            for e in pg.event.get():
-                e_pl = self.player.handle_events(e)
-                if type(e_pl) is list:
-                    self.tile_map.add_ices(e_pl)
+            if not self.pausing:
+                for e in pg.event.get():
+                    e_pl = self.player.handle_events(e)
+                    if type(e_pl) is list:
+                        self.tile_map.add_ices(e_pl)
 
-                if e.type == pg.QUIT:
-                    self.__quit__()
-                if e.type == pg.KEYDOWN:
-                    if e.key == pg.K_ESCAPE:
+                    if e.type == pg.QUIT:
+                        self.__quit__()
+                    if e.type == pg.KEYDOWN:
+                        if e.key == pg.K_ESCAPE:
+                            
+                            self.set_pause_active()
+
+                self.screen.fill((255, 255, 255))
+
+                self.update_player_fruits_tiles()
+
+                self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
+                label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
+                self.screen.blit(label, (self.W - label.get_width() - 13, 10))
+                if self.ui.get_time():
+                    self.ui.clock_animation.animate()
+                self.ui.clock_animation.update(self.screen)
+
+                self.ui.update()
+            else:
+                for event in pg.event.get():
+                    handleing = self.pause.handle_events(event)
+
+                    if handleing == "resume":
+                        self.set_pause_active()
+                    elif handleing == "quit":
+                        self.set_pause_active()
                         self.__returnToMenu__()
 
-            self.screen.fill((255, 255, 255))
+                    if event.type == pg.QUIT:
+                        self.__quit__()
 
-            self.update_player_fruits_tiles()
-
-            self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
-            label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
-            self.screen.blit(label, (self.W - label.get_width() - 13, 10))
-            if self.ui.get_time():
-                self.ui.clock_animation.animate()
-            self.ui.clock_animation.update(self.screen)
-
-            self.ui.update()
+                self.pause.update()
 
             pg.display.update()
 
