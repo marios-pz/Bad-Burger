@@ -42,7 +42,7 @@ class Game:
         # ------------------- CLASS INSTANCES ------------------------------ #
         self.clock = pg.time.Clock()
         self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, self.tile_map.TILE_SIZE, (30, 30))
-        self.ui: ui.UI = ui.UI(self.settings["FPS"])
+        self.ui: ui.UI = ui.UI(self.screen, self.fruits, self.settings["FPS"])
         self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
         self.menu = menu.Menu(self.screen, self.clock)
 
@@ -108,12 +108,22 @@ class Game:
 
         self.tile_map.update_ground()
 
-        self.fruits.update()
+        fruit_updating = self.fruits.update()
+        if fruit_updating == "victory":
+            pass
+
+            # VICTORY
+            
         self.enemy_manager.update()
 
         update_pl = self.player.update(self.dt)
         if update_pl is not None:
-            pass
+            
+            if update_pl == "dead":
+                pass
+
+
+                # DEFEAT 
 
         update_tl_map_col = self.tile_map.update_colliders()
         # check if there are blocks to remove from the player grid
@@ -150,6 +160,8 @@ class Game:
             if self.ui.get_time():
                 self.ui.clock_animation.animate()
             self.ui.clock_animation.update(self.screen)
+
+            self.ui.update()
 
             pg.display.update()
 

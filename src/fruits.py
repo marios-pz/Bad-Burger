@@ -1,3 +1,4 @@
+from copy import copy
 from typing import List
 import pprint
 import pygame
@@ -81,6 +82,7 @@ class FruitMap:
 
         self.paths = []
         self.state = 0
+        self.current_fruit = None
         
     def init_level(self, level):
         self.state = 0
@@ -101,6 +103,8 @@ class FruitMap:
 
                 for ic, fruit in enumerate(row):
                     if fruit in self.keys:
+                        self.current_fruit = copy(self.keys[fruit](self.screen, self.FRUIT_SIZE, (0, 0)))
+
                         self.grid[ir].append(self.keys[fruit](self.screen, self.FRUIT_SIZE, (
                             ic*self.TILE_W + (self.TILE_W - self.FRUIT_W)//2,
                             ir*self.TILE_H + (self.TILE_H - self.FRUIT_H)//2
@@ -130,9 +134,3 @@ class FruitMap:
             if init_ == "victory":
                 print(init_)
                 return "victory"
-        
-        print(self.state)
-        print(self.paths)
-
-        print("")
-        
