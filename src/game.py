@@ -17,7 +17,7 @@ class Game:
 
         # ------------------- SCREEN VARIABLES ----------------------------- #
         self.W, self.H = 640, 480
-        self.screen = pg.display.set_mode((self.W, self.H), pg.SCALED | pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((self.W, self.H), pg.SCALED)
 
         # ------------------- GAME STATE VARIABLES ------------------------- #
         self.running: bool = True
@@ -116,7 +116,7 @@ class Game:
             
         self.enemy_manager.update()
 
-        update_pl = self.player.update(self.dt)
+        update_pl = self.player.update(self.dt, self.enemy_manager.enemies)
         if update_pl is not None:
             
             if update_pl == "dead":

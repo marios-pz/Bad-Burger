@@ -18,6 +18,7 @@ class Player:
         self.player_grid = []
         "self.read_map(self.tile_map.current_map_collider)"
         self.index = [1, 1]
+        self.enemy_grp = []
 
         # rect
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
@@ -204,6 +205,9 @@ class Player:
         return False, None
 
     def is_blank(self, indexes):
+        for enemy in self.enemy_grp:
+            if enemy.index == indexes:
+                return (False, None)
         return (True, None) if self.player_grid[indexes[1]][indexes[0]] == 0 else (False, None)
 
     def move_right(self):
@@ -352,9 +356,11 @@ class Player:
                 self.rect = self.surface.get_rect(center=self.rect.center)
 
 
-    def update(self, dt):
+    def update(self, dt, enemy_grp):
         # update current time
         self.current_time = p.time.get_ticks()
+        # update enemy group
+        self.enemy_grp = enemy_grp
 
         # animate the player while moving to another tile
         if self.moving:

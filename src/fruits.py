@@ -13,9 +13,9 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/banana.png"), size)
+            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/banana.png"), (int(size[0]*0.8), int(size[1]*0.8)))
 
-            self.rect = self.image.get_rect(topleft=coordinates)
+            self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
         def update(self):
             self.screen.blit(self.image, self.rect)
@@ -26,9 +26,9 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/cherry.png"), size)
+            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/cherry.png"), (int(size[0]*0.8), int(size[1]*0.8)))
 
-            self.rect = self.image.get_rect(topleft=coordinates)
+            self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
         def update(self):
             self.screen.blit(self.image, self.rect)
@@ -39,9 +39,9 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/lemon.png"), size)
+            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/lemon.png"), (int(size[0]*0.8), int(size[1]*0.8)))
 
-            self.rect = self.image.get_rect(topleft=coordinates)
+            self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
         def update(self):
             self.screen.blit(self.image, self.rect)
@@ -52,9 +52,9 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/grape.png"), size)
+            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/grape.png"), (int(size[0]*0.8), int(size[1]*0.8)))
 
-            self.rect = self.image.get_rect(topleft=coordinates)
+            self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
         def update(self):
             self.screen.blit(self.image, self.rect)
