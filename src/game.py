@@ -146,43 +146,37 @@ class Game:
             self.dt *= 60
             self.last_time = time.time()
 
-            if not self.pausing:
-                for e in pg.event.get():
-                    e_pl = self.player.handle_events(e)
-                    if type(e_pl) is list:
-                        self.tile_map.add_ices(e_pl)
+            for e in pg.event.get():
+                e_pl = self.player.handle_events(e)
+                if type(e_pl) is list:
+                    self.tile_map.add_ices(e_pl)
 
-                    if e.type == pg.QUIT:
-                        self.__quit__()
-                    if e.type == pg.KEYDOWN:
-                        if e.key == pg.K_ESCAPE:
-                            
-                            self.set_pause_active()
+                if e.type == pg.QUIT:
+                    self.__quit__()
+                if e.type == pg.KEYDOWN:
+                    if e.key == pg.K_ESCAPE:
 
-                self.screen.fill((255, 255, 255))
-
-                self.update_player_fruits_tiles()
-
-                self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
-                label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
-                self.screen.blit(label, (self.W - label.get_width() - 13, 10))
-                if self.ui.get_time():
-                    self.ui.clock_animation.animate()
-                self.ui.clock_animation.update(self.screen)
-
-                self.ui.update()
-            else:
-                for event in pg.event.get():
-                    handleing = self.pause.handle_events(event)
-
-                    if handleing == "resume":
                         self.set_pause_active()
-                    elif handleing == "quit":
-                        self.set_pause_active()
-                        self.__returnToMenu__()
 
-                    if event.type == pg.QUIT:
-                        self.__quit__()
+            self.screen.fill((255, 255, 255))
+
+            self.update_player_fruits_tiles()
+
+            self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
+            label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
+            self.screen.blit(label, (self.W - label.get_width() - 13, 10))
+            if self.ui.get_time():
+                self.ui.clock_animation.animate()
+            self.ui.clock_animation.update(self.screen)
+
+            self.ui.update()
+            if self.pausing:
+                response = self.pause.run(self, self.settings["FPS"])
+                if response == "resume":
+                    self.set_pause_active()
+                elif response == "quit":
+                    self.set_pause_active()
+                    self.__returnToMenu__()
 
                 self.pause.update()
 

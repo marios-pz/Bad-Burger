@@ -22,7 +22,7 @@ def resize_ratio(image: pg.Surface, new_size: tuple[int, int]):
 
 def resizex(image: pg.surface.Surface, amount: int or float) -> pg.surface.Surface:
     w, h = image.get_width(), image.get_height()
-    return pg.transform.scale(image, (w*amount, h*amount))
+    return pg.transform.scale(image, (int(w*amount), int(h*amount)))
 
 
 def wrap_multi_lines(text: str, font: pg.font.Font, max_width: int, antialias: bool=True) -> list:
