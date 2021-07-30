@@ -11,7 +11,7 @@ class EnemyManager:
         self.tile_map = tile_map
 
         self.fruits = fruits
-        self.enemies = [enemies.Enemy1(self.screen, player, tile_map, self.fruits, (15, 5), "standard"),]
+        self.enemies = [enemies.Enemy1(self.screen, player, tile_map, (15, 5), "standard"),]
         """enemies.Enemy1(self.screen, player, tile_map, self.fruits, (5, 6), "standard"),
                         enemies.Enemy1(self.screen, player, tile_map, self.fruits, (10, 9), "standard")]"""
 

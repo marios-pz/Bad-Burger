@@ -4,7 +4,7 @@ import random
 
 class Enemy1:
 
-    def __init__(self, screen, player, tile_map, fruits, dep_pos, type):
+    def __init__(self, screen, player, tile_map, dep_pos, type):
 
         self.screen = screen
 
@@ -12,13 +12,12 @@ class Enemy1:
         self.rect = self.surface.get_rect(topleft=(dep_pos[0] * 32, dep_pos[1] * 32))
         self.index = list(dep_pos)
 
-        self.fruits = fruits
         self.player_grid = player.player_grid
         self.player = player
 
         self.direction = "right"
         self.moving = False
-        self.velocity = 4
+        self.velocity = 3
 
         self.TLS_Y = tile_map.TLS_Y
         self.TLS_X = tile_map.TLS_X
@@ -111,13 +110,6 @@ class Enemy1:
             else:
                 self.rect.y += self.velocity
 
-    def collide_fruits(self):
-        for id_r, row in enumerate(self.fruits.grid):
-            for id_c, col in enumerate(row):
-                if col is not None:
-                    if self.index == [id_c, id_r]:
-                        self.eat_fruit([id_c, id_r])
-
     def move(self):
         if self.moving:
             self.manage_animation()
@@ -143,7 +135,6 @@ class Enemy1:
                     self.move_up()
 
     def update(self):
-        self.collide_fruits()
         self.player_grid = self.player.player_grid
         self.move()
 
