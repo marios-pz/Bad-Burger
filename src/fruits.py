@@ -1,8 +1,6 @@
 from copy import copy
 from typing import List
-import pprint
 import pygame
-from pygame.display import update
 from src.utils import *
 
 
@@ -10,6 +8,7 @@ class Fruits:
     class Banana:
         def __init__(self, screen: pygame.surface.Surface, size: tuple[int, int], coordinates: tuple[int, int]):
             self.screen: pygame.surface.Surface = screen
+            self.score = 25
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
@@ -23,6 +22,7 @@ class Fruits:
     class Cherry:
         def __init__(self, screen: pygame.surface.Surface, size: tuple[int, int], coordinates: tuple[int, int]):
             self.screen: pygame.surface.Surface = screen
+            self.score = 25
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
@@ -36,6 +36,7 @@ class Fruits:
     class Lemon:
         def __init__(self, screen: pygame.surface.Surface, size: tuple[int, int], coordinates: tuple[int, int]):
             self.screen: pygame.surface.Surface = screen
+            self.score = 25
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
@@ -49,6 +50,7 @@ class Fruits:
     class Grape:
         def __init__(self, screen: pygame.surface.Surface, size: tuple[int, int], coordinates: tuple[int, int]):
             self.screen: pygame.surface.Surface = screen
+            self.score = 25
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 

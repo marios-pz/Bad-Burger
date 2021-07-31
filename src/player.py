@@ -64,10 +64,15 @@ class Player:
         self.duration = 0
         self.cd_direction = self.direction
 
-    def eat_fruit(self):
-        self.fruits.grid[self.index[1]][self.index[0]] = None
+        self.score = 0
+
+    def eat_fruit(self, ui):
+        if self.fruits.grid[self.index[1]][self.index[0]] is not None:
+            self.score += self.fruits.grid[self.index[1]][self.index[0]].score *(1 if ui.get_time() else 0.5)
+            self.fruits.grid[self.index[1]][self.index[0]] = None
 
     def init_level(self, level):
+        self.score = 0
         self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
         self.read_map(level.path_map)
@@ -355,8 +360,7 @@ class Player:
                 
                 self.rect = self.surface.get_rect(center=self.rect.center)
 
-
-    def update(self, dt, enemy_grp):
+    def update(self, dt, enemy_grp, ui):
         # update current time
         self.current_time = p.time.get_ticks()
         # update enemy group
@@ -380,7 +384,7 @@ class Player:
             self.animate_idle()
             # PUT HERE HIS WAITING ANIMATION
 
-        self.eat_fruit()
+        self.eat_fruit(ui)
         # draw the player
         self.screen.blit(self.surface, self.rect)
 

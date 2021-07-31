@@ -36,23 +36,7 @@ class Game:
         self.font_20: pg.font.Font = pg.font.Font(None, 20)
         self.last_time: float = time.time()
         self.dt: float = None
-
-        # ------------------- TILE MAP ------------------------------------- #
-        self.tile_map = tilemap.TileMap(self.screen, 32)
-
-        # ------------------- CLASS INSTANCES ------------------------------ #
-        self.clock = pg.time.Clock()
-        self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, self.tile_map.TILE_SIZE, (30, 30))
-        self.ui: ui.UI = ui.UI(self.screen, self.fruits, self.settings["FPS"])
-        self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
-        self.menu = menu.Menu(self.screen, self.clock)
-
-        self.player = player.Player(self.tile_map, self.fruits, self.screen)
-        self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
-
         self.pausing = False
-        self.pause = pause.Pause(self.screen)
-
         self.levels = [
             lvl.Level1,
             lvl.Level2,
@@ -65,6 +49,19 @@ class Game:
             lvl.Level9,
             lvl.Level10
         ]
+
+        # ------------------- TILE MAP ------------------------------------- #
+        self.tile_map = tilemap.TileMap(self.screen, 32)
+
+        # ------------------- CLASS INSTANCES ------------------------------ #
+        self.clock = pg.time.Clock()
+        self.fruits: fruits.FruitMap = fruits.FruitMap(self.screen, self.tile_map.TILE_SIZE, (30, 30))
+        self.player = player.Player(self.tile_map, self.fruits, self.screen)
+        self.ui: ui.UI = ui.UI(self.screen, self.fruits, self.settings["FPS"], self.player)
+        self.level_selector: level_selector.LevelSelector = level_selector.LevelSelector(self.screen, self.settings, self.clock, available_levels=40, last_level_unlocked=10)
+        self.menu = menu.Menu(self.screen, self.clock)
+        self.pause = pause.Pause(self.screen)
+        self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
 
     @staticmethod
     def __quit__():
@@ -123,12 +120,11 @@ class Game:
             
         self.enemy_manager.update()
 
-        update_pl = self.player.update(self.dt, self.enemy_manager.enemies)
+        update_pl = self.player.update(self.dt, self.enemy_manager.enemies, self.ui)
         if update_pl is not None:
             
             if update_pl == "dead":
                 pass
-
 
                 # DEFEAT 
 
@@ -148,7 +144,7 @@ class Game:
 
             for e in pg.event.get():
                 e_pl = self.player.handle_events(e)
-                if type(e_pl) is list:
+                if isinstance(e_pl, list):
                     self.tile_map.add_ices(e_pl)
 
                 if e.type == pg.QUIT:
