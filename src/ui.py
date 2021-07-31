@@ -19,7 +19,7 @@ class UI:
         img = load_alpha("data/assets/frut_background.png")
         self.ui_fruits: pg.Surface = pg.transform.scale(img, (img.get_width()*2, int(img.get_height()*1.2)))
 
-        self.font = pg.font.Font(None, 40)
+        self.font = pg.font.Font("data/fonts/Minecraft.ttf", 25)
         self.ui_fr_rect: pg.Rect = self.ui_fruits.get_rect(centerx=self.w//2, bottom=self.h-5)
         self.images = self.fruit_class.current_fruit
         self.images = [resize(img, (int(img.get_width()*0.8), int(img.get_height()*0.8))) for img in self.images]

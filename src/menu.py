@@ -30,12 +30,12 @@ class Menu:
         self.credits_back_image: pygame.surface.Surface = resize_ratio(load_alpha("data/assets/credits-background.png"), (self.W, self.H))
         self.help_small_window: pygame.surface.Surface = resizex(load_alpha("data/assets/credits-background-no-burger.png"), 4)
         self.running: bool = True
-        self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
-        self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
-        self.font_40: pygame.font.Font = pygame.font.Font(None, 40)
-        self.font_30: pygame.font.Font = pygame.font.Font(None, 30)
-        self.font_20: pygame.font.Font = pygame.font.Font(None, 20)
-        self.font_10: pygame.font.Font = pygame.font.Font(None, 10)
+        self.font_60: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 60)
+        self.font_50: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 50)
+        self.font_40: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 40)
+        self.font_30: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 30)
+        self.font_20: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 20)
+        self.font_10: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 10)
         self.clock: pygame.time.Clock = clock
         self.credits: bool = False
         self.run_help: bool = False
@@ -67,7 +67,13 @@ class Menu:
         self.run_help = not self.run_help
 
     def help(self):
-        back_button: ratatouille.SpecialButton = ratatouille.SpecialButton((self.W//2 - 100//2, self.H - 130), self.button_image, self.button_hover_image, (100, 40), self.toggle_help)
+        index = 0
+        
+        buttons: ratatouille.FrameWork = ratatouille.init(self.screen)
+        buttons.new_special_button((self.W//2 - 100//2, self.H - 130), self.button_image, self.button_hover_image, (100, 40), self.toggle_help)
+        buttons.new_special_button((self.W//2 - 100//2 - 50, self.H - 130), self.button_image, self.button_hover_image, (40, 40))
+        buttons.new_special_button((self.W//2 + 100//2 + 10, self.H - 130), self.button_image, self.button_hover_image, (40, 40))
+
         arrow_images = resizex(load_alpha(f"data/assets/arrows/arrow.png"), 2)
         walk_down = [load_alpha(f"data/assets/walk_down/walk_down{i+1}.png") for i in range(8)]
         walk_up = [load_alpha(f"data/assets/walk_up/walk_up{i+1}.png") for i in range(8)]
@@ -106,21 +112,20 @@ class Menu:
 
             animation_walk_showcase.animate()
             animation_walk_showcase.update(self.screen)
-            back_button.update(self.screen)
-            label = self.font_40.render("back", True, (0, 0, 0))
+            buttons.update()
+            label = self.font_30.render("back", True, (0, 0, 0))
             self.screen.blit(label, (self.W//2 - label.get_width()//2, self.H - 130 + 40//2 - label.get_height()//2))
 
-            label = self.font_50.render("moving", True, (0, 0, 0))
+            label = self.font_40.render("moving", True, (0, 0, 0))
             self.screen.blit(label, (self.W//2 - label.get_width()//2, 160))
 
-            blit_multiple_lines(217, 250, wrap_multi_lines("move the player with the arrow buttons", self.font_30, 230, True),
-                                self.screen, self.font_30, centered_x=True, centered_x_pos=self.W//2)
+            blit_multiple_lines(217, 250, wrap_multi_lines("move the player with the arrow buttons", self.font_20, 230, True),
+                                self.screen, self.font_20, centered_x=True, centered_x_pos=self.W//2)
 
             pygame.display.update()
 
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    back_button.handle_click(event.pos)
+                buttons.handle_events(event)
                 if event.type == pygame.QUIT:
                     self.__quit__()
 
@@ -173,36 +178,32 @@ class Menu:
                 self.screen.blit(self.credits_back_image, (0, 0))
 
                 self.credits_back.update(self.screen)
-                label = self.font_40.render("back", True, (0, 0, 0))
+                label = self.font_30.render("back", True, (0, 0, 0))
                 self.screen.blit(label, (self.W//2 - label.get_width()//2, self.credits_back.rect[1] + self.credits_back.rect[3]//2 - label.get_height()//2))
 
-                height = self.font_40.get_height()
+                height = self.font_30.get_height()
                 for i, text in enumerate(self.settings["credits"]):
-                    rendered_text_surface = self.font_40.render(text, True, (0, 0, 0))
+                    rendered_text_surface = self.font_30.render(text, True, (0, 0, 0))
                     self.screen.blit(rendered_text_surface, (self.W / 2 - rendered_text_surface.get_width() / 2, 50 + (380 - height * len(self.settings["credits"])) / 2 + (i * height)))
 
             else:
                 self.buttons.update()
 
-                label = self.font_40.render("play", True, (0, 0, 0))
-                self.screen.blit(label,
-                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 75))
+                label = self.font_30.render("play", True, (0, 0, 0)); _rect = label.get_rect(center=self.buttons.buttons[0].rect.center)
+                self.screen.blit(label, _rect)
 
-                label = self.font_40.render("help", True, (0, 0, 0))
-                self.screen.blit(label,
-                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 120))
+                label = self.font_30.render("help", True, (0, 0, 0)); _rect = label.get_rect(center=self.buttons.buttons[1].rect.center)
+                self.screen.blit(label, _rect)
 
-                label = self.font_40.render("credits", True, (0, 0, 0))
-                self.screen.blit(label,
-                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 165))
+                label = self.font_30.render("credits", True, (0, 0, 0)); _rect = label.get_rect(center=self.buttons.buttons[2].rect.center)
+                self.screen.blit(label, _rect)
 
-                label = self.font_40.render("quit", True, (0, 0, 0))
-                self.screen.blit(label,
-                                 (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 210))
+                label = self.font_30.render("quit", True, (0, 0, 0)); _rect = label.get_rect(center=self.buttons.buttons[3].rect.center)
+                self.screen.blit(label, _rect)
 
         else:
             self.start_menu.update(self.screen)
-            label = self.font_40.render("click to eat", True, (0, 0, 0))
+            label = self.font_30.render("click to eat", True, (0, 0, 0))
             self.screen.blit(label, (self.W // 2 - label.get_width() // 2, self.H // 2 - label.get_height() // 2 + 75))
 
         pygame.display.update()

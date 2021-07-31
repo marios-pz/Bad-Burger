@@ -23,9 +23,12 @@ class LevelSelector:
         # ------------------ VARIABLES ---------------------------- #
         self.running: bool = True
         self.button_size: tuple[int, int] = (40, 40)
-        self.font_60: pygame.font.Font = pygame.font.Font(None, 60)
-        self.font_50: pygame.font.Font = pygame.font.Font(None, 50)
-        self.font_40: pygame.font.Font = pygame.font.Font(None, 40)
+        self.font_60: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 60)
+        self.font_50: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 50)
+        self.font_40: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 40)
+        self.font_30: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 30)
+        self.font_20: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 20)
+        self.font_10: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 10)
         self.clock: pygame.time.Clock = clock
         self.table: pygame.surface.Surface = load_alpha("data/assets/table.png")
         self.level_not_available_scaled: pygame.surface.Surface = resize_ratio(load_alpha("data/assets/level_not_available.png"), (35, 45))
@@ -107,15 +110,15 @@ class LevelSelector:
         self.draw_level_buttons()
 
         # draw "level select" to the screen
-        label = self.font_60.render("level select", True, (0, 0, 0))
+        label = self.font_50.render("level select", True, (0, 0, 0))
         self.screen.blit(label, (self.W//2 - label.get_width()//2, 40))
 
         self.back_button.update(self.screen)  # draw the back button and the text for it
-        label = self.font_40.render("back", True, (0, 0, 0))
+        label = self.font_30.render("back", True, (0, 0, 0))
         self.screen.blit(label, (self.W//2 - label.get_width()//2, self.H - 80 - label.get_height()//2))
 
         for button in self.level_buttons.buttons:  # draw the numbers of the buttons and if needed the cross to tell the player that those levels aren't unlocked yet
-            label = self.font_40.render(str(button.args[0]), True, (0, 0, 0))
+            label = self.font_30.render(str(button.args[0]), True, (0, 0, 0))
             self.screen.blit(label, (button.rect[0] + self.button_size[0]//2 - label.get_width()//2, button.rect[1] + self.button_size[1]//2 - label.get_height()//2))
             if button.args[0] > self.last_level_unlocked:
                 self.screen.blit(self.level_not_available_scaled, (

@@ -29,11 +29,12 @@ class Game:
         # --------------- VARIABLES ---------------------------------------- #
         self.settings = get_json("src/settings")
         self.clock_ui: pg.surface.Surface = load_alpha("data/assets/clock/clock_ui.png")
-        self.font_60: pg.font.Font = pg.font.Font(None, 60)
-        self.font_50: pg.font.Font = pg.font.Font(None, 50)
-        self.font_40: pg.font.Font = pg.font.Font(None, 40)
-        self.font_30: pg.font.Font = pg.font.Font(None, 30)
-        self.font_20: pg.font.Font = pg.font.Font(None, 20)
+        self.font_60: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 60)
+        self.font_50: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 50)
+        self.font_40: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 40)
+        self.font_30: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 30)
+        self.font_20: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 20)
+        self.font_10: pg.font.Font = pg.font.Font("data/fonts/Minecraft.ttf", 10)
         self.last_time: float = time.time()
         self.dt: float = None
         self.pausing = False
@@ -159,8 +160,8 @@ class Game:
             self.update_player_fruits_tiles()
 
             self.screen.blit(self.clock_ui, (self.W - self.clock_ui.get_width() - 5, 5))
-            label = self.font_30.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
-            self.screen.blit(label, (self.W - label.get_width() - 13, 10))
+            label = self.font_20.render(self.ui.get_time() if self.ui.get_time() else "00:00", True, (0, 0, 0))
+            self.screen.blit(label, (self.W - label.get_width() - 17, 10))
             if self.ui.get_time():
                 self.ui.clock_animation.animate()
             self.ui.clock_animation.update(self.screen)
