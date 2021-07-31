@@ -44,7 +44,7 @@ class UI:
         self.screen.blit(self.ui_fruits, self.ui_fr_rect)
 
         self.screen.blit(self.ui_fruits, (self.ui_fr_rect.x, 0))
-        score = self.font.render(f"""score: {"0" * (5 - len(str(self.player.score))) + str(int(self.player.score))}""", True, (0, 0, 0))
+        score = self.font.render(f'{"0" * (5 - len(str(self.player.score))) + str(int(self.player.score))}', True, (0, 0, 0))
         self.screen.blit(score, (self.ui_fr_rect.centerx - score.get_width()//2, 5))
 
         prev = copy(self.images)
