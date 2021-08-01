@@ -1,10 +1,12 @@
 class Level1:
-    begin_player_pos = [4, 5]
+    begin_player_pos = [2, 1]
     path_map = "data/level-maps/level1/map.txt"
     path_fruits = [
         "data/level-maps/level1/fruits_1.txt"
     ]
-    enemies = []
+    enemies = [
+        [19, 2],
+    ]
 
 
 class Level2:
@@ -13,7 +15,10 @@ class Level2:
     path_fruits = [
         "data/level-maps/Level2/fruits_1.txt"
     ]
-    enemies = []
+    enemies = [
+        [3, 13],
+        [18, 3]
+    ]
 
 
 class Level3:
@@ -22,17 +27,23 @@ class Level3:
     path_fruits = [
         "data/level-maps/Level3/fruits_1.txt"
     ]
-    enemies = []
+    enemies = [
+        [1, 12],
+        [17, 1]
+    ]
 
 
 class Level4:
-    begin_player_pos = [10, 5]
+    begin_player_pos = [10, 6]
     path_map = "data/level-maps/level4/map.txt"
     path_fruits = [
         "data/level-maps/Level4/fruits_1.txt",
         "data/level-maps/Level4/fruits_2.txt"
     ]
-    enemies = []
+    enemies = [
+        [2, 13],
+        [17, 1]
+    ]
 
 
 class Level5:
@@ -42,7 +53,11 @@ class Level5:
         "data/level-maps/Level5/fruits_2.txt",
         "data/level-maps/Level5/fruits_1.txt"
     ]
-    enemies = []
+    enemies = [
+        [2, 13],
+        [17, 1],
+        [12, 1]
+    ]
 
 
 class Level6:
@@ -53,7 +68,10 @@ class Level6:
         "data/level-maps/Level6/fruits_2.txt",
         "data/level-maps/Level6/fruits_3.txt"
     ]
-    enemies = []
+    enemies = [
+        [2, 13],
+        [15, 5]
+    ]
 
 
 class Level7:
@@ -64,7 +82,10 @@ class Level7:
         "data/level-maps/Level7/fruits_2.txt",
         "data/level-maps/Level7/fruits_3.txt"
     ]
-    enemies = []
+    enemies = [
+        [17, 11],
+        [1, 5]
+    ]
 
 
 class Level8:
@@ -74,25 +95,37 @@ class Level8:
         "data/level-maps/Level8/fruits_1.txt",
         "data/level-maps/Level8/fruits_2.txt"
     ]
-    enemies = []
+    enemies = [
+        [9, 12],
+        [17, 3]
+    ]
 
 
 class Level9:
-    begin_player_pos = [12, 7]
+    begin_player_pos = [3, 1]
     path_map = "data/level-maps/level9/map.txt"
     path_fruits = [
         "data/level-maps/Level9/fruits_1.txt",
         "data/level-maps/Level9/fruits_2.txt"
     ]
-    enemies = []
+    enemies = [
+        [3, 13],
+        [16, 1],
+        [12, 7],
+        [16, 13]
+    ]
 
 
 class Level10:
-    begin_player_pos = [12, 3]
+    begin_player_pos = [3, 6]
     path_map = "data/level-maps/level10/map.txt"
     path_fruits = [
         "data/level-maps/Level10/fruits_1.txt",
         "data/level-maps/Level10/fruits_2.txt",
         "data/level-maps/Level10/fruits_3.txt"
     ]
-    enemies = []
+    enemies = [
+        [16, 3],
+        [8, 12],
+        [10, 2]
+    ]

@@ -13,7 +13,7 @@ class Enemy1:
         self.screen = screen
         self.tile_map = tile_map
 
-        self.surface = pg.Surface((32, 32))
+        self.surface = resizex(load_alpha(f"data/assets/enemy1_down/enemy1_down1.png"),1)
         self.rect = self.surface.get_rect(center=(dep_pos[0] * 32 + 16, dep_pos[1] * 32 + 16)) # Pls move the enemy a little to the left if possible
         self.index = list(dep_pos)
 

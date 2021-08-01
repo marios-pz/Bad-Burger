@@ -80,6 +80,7 @@ class Game:
         self.running_game, self.running_menu, self.running_level_selector = False, True, False
 
     def __startGame__(self, level):  # start running the game
+        self.player.score = 0
         self.victory = None
         self.current_level = level
         self.player.init_level(self.levels[level-1])

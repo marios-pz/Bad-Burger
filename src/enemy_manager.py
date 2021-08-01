@@ -7,7 +7,7 @@ class EnemyManager:
 
     def __init__(self, screen, player, tile_map, fruits):
         self.screen, self.w, self.h = screen, screen.get_width(), screen.get_height()
-
+        self.player, self.tile_map, self.fruits = player, tile_map, fruits
         self.tile_map = tile_map
 
         self.fruits = fruits
@@ -23,7 +23,9 @@ class EnemyManager:
         self.init_grid()
 
     def init_level(self, level):
+        
         self.level = level
+        self.enemies = [enemies.Enemy1(self.screen, self.player, self.tile_map, pos, "standard") for pos in self.level.enemies]
         self.state = 0
         self.init_grid()
 
