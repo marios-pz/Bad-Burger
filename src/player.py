@@ -76,6 +76,8 @@ class Player:
             self.fruits.grid[self.index[1]][self.index[0]] = None
 
     def init_level(self, level):
+        self.victory = None
+        self.dying = False
         self.score = 0
         self.index = copy.copy(level.begin_player_pos)
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
