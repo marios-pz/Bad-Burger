@@ -10,6 +10,7 @@ import src.menu as menu
 import src.levels as lvl
 import src.enemy_manager as enemy_manager
 import src.pause as pause
+import src.winning_screen as winning_screen
 
 
 class Game:
@@ -63,6 +64,9 @@ class Game:
         self.menu = menu.Menu(self.screen, self.clock)
         self.pause = pause.Pause(self.screen)
         self.enemy_manager = enemy_manager.EnemyManager(self.screen, self.player, self.tile_map, self.fruits)
+        self.winning_screen = None
+        self.victory = None
+        self.current_level = None
 
     @staticmethod
     def __quit__():
@@ -74,14 +78,38 @@ class Game:
         self.running_game, self.running_menu, self.running_level_selector = False, True, False
 
     def __startGame__(self, level):  # start running the game
+        self.victory = None
+        self.current_level = level
         self.player.init_level(self.levels[level-1])
         self.tile_map.init_level(self.levels[level-1])
         self.fruits.init_level(self.levels[level-1])  # it loads the first layer of fruits
         self.enemy_manager.init_level(self.levels[level-1])
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
 
+    def restart_level(self):
+        self.__startGame__(self.current_level)
+
+    def next_level(self):
+        if self.current_level < len(self.levels)-1:
+            self.current_level += 1
+            self.player.moving = False
+            self.player.victory = False
+            self.__startGame__(self.current_level)
+
     def __startLevelSelector__(self):  # it starts the level selector
         self.running_game, self.running_menu, self.running_level_selector = False, False, True
+
+    def __initVictory__(self):
+        self.victory = True
+        self.player.moving = False
+        self.player.victory = True
+        self.winning_screen = winning_screen.WinningScreen(self.screen, True, self.player.score)
+
+    def __initDefeat__(self):
+        self.victory = False
+        self.player.moving = False
+        self.player.victory = False
+        self.winning_screen = winning_screen.WinningScreen(self.screen, False, self.player.score)
 
     def set_pause_active(self):
         self.pausing = not self.pausing
@@ -115,9 +143,8 @@ class Game:
 
         fruit_updating = self.fruits.update()
         if fruit_updating == "victory":
-            pass
-
-            # VICTORY
+            
+            self.__initVictory__()
             
         self.enemy_manager.update()
 
@@ -176,6 +203,15 @@ class Game:
                     self.__returnToMenu__()
 
                 self.pause.update()
+            if self.victory is not None:
+                response = self.winning_screen.run(self, self.settings["FPS"])
+                if response == "restart":
+                    self.restart_level()
+                elif response == "next level":
+                    self.next_level()
+                elif response == "quit":
+                    self.__returnToMenu__()
+                self.winning_screen.update()
 
             pg.display.update()
 
