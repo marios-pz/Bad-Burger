@@ -33,7 +33,7 @@ class Pause:
             self.set_response, ("quit", )
         )
 
-        self.font = pg.font.Font(None, 35)
+        self.font = pg.font.Font("data/assets/fonts/Minecraft.ttf", 25)
         self.texts = [self.font.render("resume", True, (0, 0, 0)), self.font.render("quit", True, (0, 0, 0))]
 
         self.opacity_layer = pg.Surface(self.screen.get_size())
