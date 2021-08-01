@@ -60,11 +60,8 @@ class Player:
         self.destroying = False
 
         self.cooldown = True
-        self.delay_cd = 0
-        self.duration = 0
+        self.delay_cd = self.duration = self.score = 0
         self.cd_direction = self.direction
-
-        self.score = 0
 
     def eat_fruit(self, ui):
         if self.fruits.grid[self.index[1]][self.index[0]] is not None:
@@ -78,30 +75,8 @@ class Player:
         self.read_map(level.path_map)
 
     def read_map(self, name):
-
-        with open(name, "r") as f:
-            datas = f.readlines()
-
-        '''
-        self.player_grid = [  We change to this one if it isn't glitchy
-
-            [0 if col == '0' else 1 for col in row.strip()]          
-            for row in datas
-        ]
-        '''
-       
-        self.player_grid = []
-        for row in datas:
-            row = row.strip()
-            row = row.replace(" ", "")
-            line = []
-            print(row)
-            for col in row:
-                if col == "1" or col == "2" or col == "3":
-                    line.append(1)
-                else:
-                    line.append(0)
-            self.player_grid.append(line)
+        with open(name, "r") as f: datas = f.readlines()
+        self.player_grid = [[1 if col == '1' or col == '2' or col == '3' else 0 for col in row.strip().split()] for row in datas]
         
     def handle_events(self, event):
         # have to fix this for the ordered spell
@@ -138,13 +113,9 @@ class Player:
         is_ice = self.check_ice_block(next_cell)
         self.casting_spell = True
         self.began_casting_spell = p.time.get_ticks()
+        self.destroying = is_ice[0] # Where output 1 is True and 0 False
+        return self.spell_ice(next_cell, self.destroying)
 
-        if is_ice[0]:
-            self.destroying = True
-            self.spell_ice(next_cell, True)
-        else:
-            self.destroying = False
-            return self.spell_ice(next_cell, False)
 
     def reset_ice_blocks(self, indexes: list):
         for index in indexes:
@@ -152,10 +123,7 @@ class Player:
 
     def spell_ice(self, first_cell, destruct):
         indexes = []
-        if destruct:
-            is_available = self.check_ice_block(first_cell)
-        else:
-            is_available = self.is_blank(first_cell)
+        is_available = self.check_ice_block(first_cell) if destruct else self.is_blank(first_cell)
         count = 0
         while is_available[0]:
             if destruct:
@@ -388,11 +356,7 @@ class Player:
         # draw the player
         self.screen.blit(self.surface, self.rect)
 
-        if self.cooldown:
-            if self.cd_direction != self.direction:
-                self.cooldown = False
-
-            if self.current_time - self.delay_cd > self.duration:
+        if self.cooldown and self.cd_direction != self.direction or self.current_time - self.delay_cd > self.duration:
                 self.cooldown = False
 
         if not self.casting_spell:
@@ -410,10 +374,4 @@ class Player:
             elif pressed[p.K_UP]:
                 self.animate()
                 self.move_up()
-
-        # DEBUG MODE :
-        """for index, row in enumerate(self.player_grid):
-            for index2, col in enumerate(row):
-                if col == 1:
-                    pg.draw.rect(self.screen, (255, 0, 0), [index2*32, index*32, 32, 32])"""
 

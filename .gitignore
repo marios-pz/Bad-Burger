@@ -5,3 +5,7 @@
 *.pyc
 *.pyc
 *.pyc
+*.pyc
+*.swp
+src/__pycache__/game.cpython-39.pyc
+*.pyc
