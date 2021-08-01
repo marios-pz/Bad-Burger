@@ -39,6 +39,10 @@ class EnemyManager:
                 lines.append(0) if col == "0" else lines.append(1)
             self.fruits.append(lines)
 
+    def set_victory(self, victory):
+        for enemy in self.enemies:
+            enemy.victory = victory
+
     def update(self) -> None:
 
         for enemy in self.enemies:

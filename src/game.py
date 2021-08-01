@@ -67,6 +67,8 @@ class Game:
         self.winning_screen = None
         self.victory = None
         self.current_level = None
+        self.delay = 0
+        self.end = False
 
     @staticmethod
     def __quit__():
@@ -85,6 +87,7 @@ class Game:
         self.fruits.init_level(self.levels[level-1])  # it loads the first layer of fruits
         self.enemy_manager.init_level(self.levels[level-1])
         self.running_game, self.running_menu, self.running_level_selector = True, False, False
+        self.end = False
 
     def restart_level(self):
         self.__startGame__(self.current_level)
@@ -100,15 +103,20 @@ class Game:
         self.running_game, self.running_menu, self.running_level_selector = False, False, True
 
     def __initVictory__(self):
+        self.delay = pg.time.get_ticks()
         self.victory = True
         self.player.moving = False
         self.player.victory = True
+        self.enemy_manager.set_victory(False)
         self.winning_screen = winning_screen.WinningScreen(self.screen, True, self.player.score)
 
     def __initDefeat__(self):
+        self.delay = pg.time.get_ticks()
         self.victory = False
         self.player.moving = False
         self.player.victory = False
+        self.player.dying = True
+        self.enemy_manager.set_victory(False)
         self.winning_screen = winning_screen.WinningScreen(self.screen, False, self.player.score)
 
     def set_pause_active(self):
@@ -145,16 +153,15 @@ class Game:
         if fruit_updating == "victory":
             
             self.__initVictory__()
-            
+
+        self.player.update(self.dt, self.enemy_manager.enemies, self.ui)
         self.enemy_manager.update()
 
-        update_pl = self.player.update(self.dt, self.enemy_manager.enemies, self.ui)
-        if update_pl is not None:
-            
-            if update_pl == "dead":
-                pass
-
-                # DEFEAT 
+        if self.victory is None:
+            for enemy in self.enemy_manager.enemies:
+                if enemy.index == self.player.index:
+                    self.__initDefeat__()
+                    
 
         update_tl_map_col = self.tile_map.update_colliders()
         # check if there are blocks to remove from the player grid
@@ -203,7 +210,7 @@ class Game:
                     self.__returnToMenu__()
 
                 self.pause.update()
-            if self.victory is not None:
+            if self.end:
                 response = self.winning_screen.run(self, self.settings["FPS"])
                 if response == "restart":
                     self.restart_level()
@@ -212,6 +219,11 @@ class Game:
                 elif response == "quit":
                     self.__returnToMenu__()
                 self.winning_screen.update()
+
+            if self.victory is not None:
+                print(pg.time.get_ticks() - self.delay)
+                if pg.time.get_ticks() - self.delay > 2000:
+                    self.end = True
 
             pg.display.update()
 

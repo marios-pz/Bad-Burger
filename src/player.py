@@ -23,6 +23,7 @@ class Player:
         # rect
         self.rect = self.surface.get_rect(topleft=p.Vector2(self.index[0]*self.TLS_X, self.index[1]*self.TLS_Y))
 
+        self.victory = None
         self.moving = False
         self.direction = "right"
         self.velocity = 5
@@ -59,9 +60,13 @@ class Player:
         self.down_power = [load_alpha(f"data/assets/power_down/{file}") for file in listdir("data/assets/power_down")]
         self.destroying = False
 
+        self.dying_anim = [load_alpha(f"data/assets/player_dying/{file}") for file in listdir("data/assets/player_dying")]
+
         self.cooldown = True
         self.delay_cd = self.duration = self.score = 0
         self.cd_direction = self.direction
+
+        self.dying = False
 
     def eat_fruit(self, ui):
         if self.fruits.grid[self.index[1]][self.index[0]] is not None:
@@ -86,7 +91,7 @@ class Player:
 
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
-                if not self.moving and not self.casting_spell and not self.cooldown:
+                if not self.moving and not self.casting_spell and not self.cooldown and not self.dying:
                     return self.cast_spell()    
                 else:
                     self.ordered_spell = True
@@ -348,18 +353,25 @@ class Player:
             self.animate_attack()
 
         else:
-            
-            self.animate_idle()
-            # PUT HERE HIS WAITING ANIMATION
+            if not self.dying:
+                self.animate_idle()
 
         self.eat_fruit(ui)
         # draw the player
         self.screen.blit(self.surface, self.rect)
 
         if self.cooldown and self.cd_direction != self.direction or self.current_time - self.delay_cd > self.duration:
-                self.cooldown = False
+            self.cooldown = False
 
-        if not self.casting_spell:
+        if self.dying:
+            if self.current_time - self.delay_anim > 75:
+                if self.index_anim < len(self.dying_anim)-1:
+                    self.index_anim += 1
+                self.delay_anim = self.current_time
+                self.surface = self.dying_anim[self.index_anim]
+                self.rect = self.surface.get_rect(center=self.rect.center)
+
+        if not self.casting_spell and not self.dying:
             # get keys pressed
             pressed = p.key.get_pressed()
             if pressed[p.K_LEFT]:
