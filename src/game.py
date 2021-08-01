@@ -150,7 +150,7 @@ class Game:
         self.tile_map.update_ground()
 
         fruit_updating = self.fruits.update()
-        if fruit_updating == "victory":
+        if fruit_updating == "victory" and self.victory is None:
             
             self.__initVictory__()
 

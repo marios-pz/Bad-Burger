@@ -61,6 +61,8 @@ class Player:
         self.destroying = False
 
         self.dying_anim = [load_alpha(f"data/assets/player_dying/{file}") for file in listdir("data/assets/player_dying")]
+    
+        self.winning_anim = [load_alpha(f"data/assets/winning/{file}") for file in listdir("data/assets/winning")]
 
         self.cooldown = True
         self.delay_cd = self.duration = self.score = 0
@@ -353,7 +355,7 @@ class Player:
             self.animate_attack()
 
         else:
-            if not self.dying:
+            if not self.dying and not self.victory:
                 self.animate_idle()
 
         self.eat_fruit(ui)
@@ -363,6 +365,13 @@ class Player:
         if self.cooldown and self.cd_direction != self.direction or self.current_time - self.delay_cd > self.duration:
             self.cooldown = False
 
+        if self.victory:
+            if self.current_time - self.delay_anim > 75:
+                self.delay_anim = self.current_time
+                self.index_anim = (self.index_anim + 1) % len(self.winning_anim)
+                self.surface = self.winning_anim[self.index_anim]
+                self.rect = self.surface.get_rect(center=self.rect.center)
+
         if self.dying:
             if self.current_time - self.delay_anim > 75:
                 if self.index_anim < len(self.dying_anim)-1:
@@ -371,7 +380,7 @@ class Player:
                 self.surface = self.dying_anim[self.index_anim]
                 self.rect = self.surface.get_rect(center=self.rect.center)
 
-        if not self.casting_spell and not self.dying:
+        if not self.casting_spell and not self.dying and self.victory is None:
             # get keys pressed
             pressed = p.key.get_pressed()
             if pressed[p.K_LEFT]:
