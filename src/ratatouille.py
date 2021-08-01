@@ -144,7 +144,7 @@ class SpecialButton:
             image_hover = pg.image.load(image_hover).convert()
 
         # we resize the images
-        self.image, self.image_hover = pg.transform.smoothscale(image, size), pg.transform.smoothscale(image_hover,
+        self.image, self.image_hover = pg.transform.scale(image, size), pg.transform.scale(image_hover,
                                                                                                        size)
         self.rect = self.image.get_rect(
             topleft=coordinates)  # As the images are resized to the same size, we can use the same , rect for both

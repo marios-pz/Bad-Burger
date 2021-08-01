@@ -34,6 +34,10 @@ class Enemy1:
         self.delay = 0
         self.showing = False
 
+        self.spot_sound = pg.mixer.Sound('data/detect.wav')
+        self.spot_sound.set_volume(0.2)
+        self.detect_counter = 0
+
     def break_ice(self, first_cell):
         self.player_grid = self.player.player_grid
 
@@ -215,8 +219,13 @@ class Enemy1:
             self.delaying = False
         self.screen.blit(self.surface, self.rect)
         if self.radius_player_detection():
+            if not self.detect_counter:
+                self.spot_sound.play()
+                self.detect_counter = 1
             if self.current_time - self.delay > 250:
                 self.delay = self.current_time
                 self.showing = not self.showing
             if self.showing:
                 self.screen.blit(self.exclamation_point, self.rect.topleft)
+        else:
+            self.detect_counter = 0

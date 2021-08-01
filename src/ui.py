@@ -22,7 +22,7 @@ class UI:
         self.font = pg.font.Font("data/fonts/Minecraft.ttf", 25)
         self.ui_fr_rect: pg.Rect = self.ui_fruits.get_rect(centerx=self.w//2, bottom=self.h-5)
         self.images = self.fruit_class.current_fruit
-        self.images = [resize(img, (int(img.get_width()*0.8), int(img.get_height()*0.8))) for img in self.images]
+        self.images = [resizex(img, 0.8) for img in self.images]
         self.rects = [img.get_rect(center=(self.ui_fr_rect.centerx-(len(self.images)//2)*id_, self.ui_fr_rect.centery)) for id_, img in enumerate(self.images)]
 
     def reset(self, time_for_level):
@@ -40,7 +40,6 @@ class UI:
             }"""
 
     def update(self):
-        
         self.screen.blit(self.ui_fruits, self.ui_fr_rect)
 
         self.screen.blit(self.ui_fruits, (self.ui_fr_rect.x, 0))

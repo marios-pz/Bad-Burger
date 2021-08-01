@@ -6,13 +6,7 @@ from .utils import *
 class LevelSelector:
     def __init__(self, screen: pygame.surface.Surface, settings: dict, clock: pygame.time.Clock, available_levels: int=1,
                  last_level_unlocked: int=1):
-        """
-        :param screen: pygame.surface.Surface
-        :param settings: dict
-        :param clock: pygame.time.Clock
-        :param available_levels: int
-        :param last_level_unlocked: int
-        """
+
         self.settings: dict = settings
 
         # ------------------ SCREEN VARIABLES --------------------- #
@@ -22,7 +16,7 @@ class LevelSelector:
 
         # ------------------ VARIABLES ---------------------------- #
         self.running: bool = True
-        self.button_size: tuple[int, int] = (40, 40)
+        self.button_size: tuple[int, int] = (41, 40)
         self.font_60: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 60)
         self.font_50: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 50)
         self.font_40: pygame.font.Font = pygame.font.Font("data/fonts/Minecraft.ttf", 40)

@@ -1,7 +1,7 @@
 import pygame as p
 from src.tiles import ColliderTiles as CT
 import copy
-from os import listdir
+from os import listdir, terminal_size
 from src.utils import *
 
 
@@ -70,8 +70,20 @@ class Player:
 
         self.dying = False
 
+        self.ability_sound = p.mixer.Sound("data/ability.wav")
+        self.ability_sound.set_volume(0.2)
+
+        self.break_sound = p.mixer.Sound('data/ice_smash.wav')
+        self.break_sound.set_volume(0.2)
+
+        self.eat_sound = p.mixer.Sound('data/fruit_pickup.wav')
+        self.death_sound = p.mixer.Sound('data/death.wav')
+        self.death_sound.set_volume(0.3)
+        self.d_c = 0
+
     def eat_fruit(self, ui):
         if self.fruits.grid[self.index[1]][self.index[0]] is not None:
+            self.eat_sound.play()
             self.score += self.fruits.grid[self.index[1]][self.index[0]].score *(1 if ui.get_time() else 0.5)
             self.fruits.grid[self.index[1]][self.index[0]] = None
 
@@ -88,11 +100,6 @@ class Player:
         self.player_grid = [[1 if col == '1' or col == '2' or col == '3' else 0 for col in row.strip().split()] for row in datas]
         
     def handle_events(self, event):
-        # have to fix this for the ordered spell
-        """if self.ordered_spell and not self.moving and not self.casting_spell:
-            self.ordered_spell = False
-            return self.cast_spell()"""
-
         if event.type == p.KEYDOWN:
             if event.key == p.K_SPACE:
                 if not self.moving and not self.casting_spell and not self.cooldown and not self.dying:
@@ -128,6 +135,7 @@ class Player:
 
     def reset_ice_blocks(self, indexes: list):
         for index in indexes:
+            self.break_sound.play()
             self.player_grid[index[1]][index[0]] = 0
 
     def spell_ice(self, first_cell, destruct):
@@ -164,13 +172,9 @@ class Player:
 
             if destruct:
                 is_available = self.check_ice_block(first_cell)
-            else:
-                
+            else:         
                 is_available = self.is_blank(first_cell)
-
-            print(first_cell, end=",")
             count += 1
-        print("end")
 
         self.cooldown = True
         self.delay_cd = pg.time.get_ticks() + count * 100
@@ -319,13 +323,11 @@ class Player:
             self.delay_anim = self.current_time
 
             if self.destroying:
-
                 self.index_anim = (self.index_anim + 1) % len(self.kick_animation)
                 self.surface = self.kick_animation[self.index_anim]
                 self.rect = self.surface.get_rect(center=self.rect.center)
             else:
                 self.index_anim = (self.index_anim + 1) % len(self.left_power)
-
                 if self.direction == "down":
                     self.surface = self.down_power[self.index_anim]
                 elif self.direction == "left":
@@ -344,18 +346,14 @@ class Player:
         self.enemy_grp = enemy_grp
 
         # animate the player while moving to another tile
-        if self.moving:
-            
+        if self.moving:         
             self.animate()
-
             self.manage_animation(dt)
-
         elif self.casting_spell:
-
             if self.current_time - self.began_casting_spell > 500:
+                self.ability_sound.play()
                 self.casting_spell = False
             self.animate_attack()
-
         else:
             if not self.dying and not self.victory:
                 self.animate_idle()
@@ -374,13 +372,18 @@ class Player:
                 self.surface = self.winning_anim[self.index_anim]
                 self.rect = self.surface.get_rect(center=self.rect.center)
 
-        if self.dying:
+        if self.dying:   
+            if not self.d_c:
+                self.death_sound.play()
+                self.d_c = True
             if self.current_time - self.delay_anim > 75:
                 if self.index_anim < len(self.dying_anim)-1:
                     self.index_anim += 1
                 self.delay_anim = self.current_time
                 self.surface = self.dying_anim[self.index_anim]
                 self.rect = self.surface.get_rect(center=self.rect.center)
+        else:
+            self.d_c = False
 
         if not self.casting_spell and not self.dying and self.victory is None:
             # get keys pressed

@@ -70,6 +70,10 @@ class Game:
         self.delay = 0
         self.end = False
 
+        self.music = pg.mixer.Sound('data/boil.wav')
+        self.music.set_volume(0.2)
+        self.win = pg.mixer.Sound('data/win.wav')
+
     @staticmethod
     def __quit__():
         # quit the entire program
@@ -78,8 +82,10 @@ class Game:
 
     def __returnToMenu__(self):  # start running the menu
         self.running_game, self.running_menu, self.running_level_selector = False, True, False
+        self.music.stop()
 
     def __startGame__(self, level):  # start running the game
+        self.music.play(-1)
         self.player.score = 0
         self.victory = None
         self.current_level = level
@@ -104,6 +110,7 @@ class Game:
         self.running_game, self.running_menu, self.running_level_selector = False, False, True
 
     def __initVictory__(self):
+        self.win.play()
         self.delay = pg.time.get_ticks()
         self.victory = True
         self.player.moving = False

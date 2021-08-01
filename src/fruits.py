@@ -2,6 +2,7 @@ from copy import copy
 from typing import List
 import pygame
 from src.utils import *
+from pygame import mixer
 
 
 class Fruits:
@@ -12,7 +13,8 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/banana.png"), (int(size[0]*0.8), int(size[1]*0.8)))
+            self.image: pygame.surface.Surface = resizex(load_alpha("data/assets/fruits/banana.png"),0.9)
+
 
             self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
@@ -26,7 +28,7 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/cherry.png"), (int(size[0]*0.8), int(size[1]*0.8)))
+            self.image: pygame.surface.Surface = resizex(load_alpha("data/assets/fruits/cherry.png"),0.9)
 
             self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
@@ -40,7 +42,7 @@ class Fruits:
             self.w: int = screen.get_width()
             self.h: int = screen.get_height()
 
-            self.image: pygame.surface.Surface = resize(load_alpha("data/assets/fruits/lemon.png"), (int(size[0]*0.8), int(size[1]*0.8)))
+            self.image: pygame.surface.Surface = resizex(load_alpha("data/assets/fruits/lemon.png"),0.9)
 
             self.rect = self.image.get_rect(center=coordinates+pg.Vector2(size[0]//2, size[1]//2))
 
@@ -139,8 +141,6 @@ class FruitMap:
                     fruit.update()
 
         if not updated:
-            
             init_ = self.init_state()
             if init_ == "victory":
-                print(init_)
                 return "victory"
