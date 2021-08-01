@@ -14,7 +14,7 @@ class Enemy1:
         self.tile_map = tile_map
 
         self.surface = pg.Surface((32, 32))
-        self.rect = self.surface.get_rect(center=(dep_pos[0] * 32, dep_pos[1] * 32)) # Pls move the enemy a little to the left if possible
+        self.rect = self.surface.get_rect(center=(dep_pos[0] * 32 + 16, dep_pos[1] * 32 + 16)) # Pls move the enemy a little to the left if possible
         self.index = list(dep_pos)
 
         self.player_grid, self.player = player.player_grid, player
@@ -24,9 +24,9 @@ class Enemy1:
         self.TLS_Y, self.TLS_X = tile_map.TLS_Y, tile_map.TLS_X
         self.target =  self.tr_dir_x = self.tr_dir_y  = self.nearest = self.nr_id = self.nr_obj = None
 
-        self.anim_down = [resizex(load_alpha(f"data/assets/enemy1_down/{file}"),1.5) for file in listdir("data/assets/enemy1_down")]
-        self.anim_up = [resizex(load_alpha(f"data/assets/enemy1_up/{file}"),1.5) for file in listdir("data/assets/enemy1_up")]
-        self.anim_left = [resizex(load_alpha(f'data/assets/enemy1_side/{file}'), 1.5) for file in listdir('data/assets/enemy1_side')]
+        self.anim_down = [resizex(load_alpha(f"data/assets/enemy1_down/{file}"),1) for file in listdir("data/assets/enemy1_down")]
+        self.anim_up = [resizex(load_alpha(f"data/assets/enemy1_up/{file}"),1) for file in listdir("data/assets/enemy1_up")]
+        self.anim_left = [resizex(load_alpha(f'data/assets/enemy1_side/{file}'), 1) for file in listdir('data/assets/enemy1_side')]
         self.anim_right = [pg.transform.flip(image, True, False).convert_alpha() for image in self.anim_left]
         self.current_time = pg.time.get_ticks()
 
@@ -172,7 +172,7 @@ class Enemy1:
                     if not self.coll_up():
                         self.move_up()
                     else:
-                        self.break_ice([self.index[0], self.index[1]+1])
+                        self.break_ice([self.index[0], self.index[1]-1])
 
             elif type(path) is list:
                 if self.index[0]-path[1][0] < 0:
