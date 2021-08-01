@@ -30,6 +30,10 @@ class Enemy1:
         self.anim_right = [pg.transform.flip(image, True, False).convert_alpha() for image in self.anim_left]
         self.current_time = pg.time.get_ticks()
 
+        self.exclamation_point = load_alpha("data/assets/exlamation_point.png")
+        self.delay = 0
+        self.showing = False
+
     def break_ice(self, first_cell):
         self.player_grid = self.player.player_grid
 
@@ -210,3 +214,9 @@ class Enemy1:
         elif self.current_time - self.delayed > 600:
             self.delaying = False
         self.screen.blit(self.surface, self.rect)
+        if self.radius_player_detection():
+            if self.current_time - self.delay > 250:
+                self.delay = self.current_time
+                self.showing = not self.showing
+            if self.showing:
+                self.screen.blit(self.exclamation_point, self.rect.topleft)
