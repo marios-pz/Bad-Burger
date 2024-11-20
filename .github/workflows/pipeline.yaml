@@ -1,0 +1,51 @@
+name: "Build Release"
+
+on:
+  workflow_dispatch:
+
+env:
+  VERSION: v1.0
+  GAME_TITLE: "Bad Burger 1.0"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build game
+        run: |
+          pyinstaller build.spec
+          chmod +x ./dist/*
+
+      - name: Install Zip package
+        uses: montudor/action-zip@v1.0.0
+
+      - name: Start zipping
+        run: |
+          zip "${GAME_TITLE} ${{ matrix.os }}.zip" ./dist/*
+
+      - name: Upload To Github Release
+        uses: xresloader/upload-to-github-release@v1.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ./*.zip
+          branches: main
+          verbose: true
+          tag_name: ${{ env.VERSION }}
