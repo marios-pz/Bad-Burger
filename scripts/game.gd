@@ -8,6 +8,7 @@ const COLS := 20
 const ROWS := 15
 const FLOOR := Color8(80, 38, 19)
 const TIME_LIMIT := 120.0
+const ZOOM := 1.5  ## how close the camera is, 1.0 shows the whole kitchen
 const END_DELAY := 2.0  ## seconds the win or lose animation plays before the popup
 const FRUIT_POINTS := 25.0
 const ICE_ALPHA := 180.0 / 255.0
@@ -56,6 +57,7 @@ func _ready() -> void:
 	_build_hud()
 	_load_wave()
 	player = _spawn(PlayerScript, G.LEVELS[G.level - 1].start)
+	_add_camera()
 	for c in G.LEVELS[G.level - 1].enemies:
 		enemies.append(_spawn(EnemyScript, c))
 	astar.region = Rect2i(0, 0, COLS, ROWS)
@@ -78,6 +80,21 @@ func _process(delta: float) -> void:
 	if not over and _enemy_at(player.cell):
 		finish(false)
 	_update_hud()
+
+
+## A camera that follows the burger, zoomed in so the kitchen feels
+## closer, and stops at the kitchen walls so nothing outside shows.
+func _add_camera() -> void:
+	var cam := Camera2D.new()
+	cam.zoom = Vector2(ZOOM, ZOOM)
+	cam.limit_left = 0
+	cam.limit_top = 0
+	cam.limit_right = COLS * TILE
+	cam.limit_bottom = ROWS * TILE
+	cam.position_smoothing_enabled = true
+	cam.position_smoothing_speed = 8.0
+	player.add_child(cam)
+	cam.reset_smoothing()
 
 
 func _spawn(script: Script, c: Vector2i) -> Actor:

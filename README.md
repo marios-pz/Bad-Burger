@@ -40,6 +40,7 @@ The game should feel the same. Under the hood a few things got simpler:
 - All the game sprites (about 130 PNG files) are packed into one sheet, `assets/atlas.png`. The original images live in `art/sprites/`. If you change them, run `python3 tools/build_atlas.py` to rebuild the sheet.
 - The menus, popups and HUD use a Godot theme, `assets/ui_theme.tres`, instead of drawn images. Open it in the Godot editor to change colors, borders or fonts everywhere at once. Menus also work with a keyboard or a gamepad now.
 - The chefs find their way with Godot's built in pathfinding instead of our own.
+- The camera follows the burger, zoomed in 1.5 times so the kitchen feels closer. Change `ZOOM` at the top of `scripts/game.gd` to zoom in or out, 1.0 shows the whole kitchen like the original.
 - Pausing really freezes everything now, ice timers included.
 - The music and sound buttons in the menu actually work, and the game remembers your choice.
 - A few old bugs are gone. "Next level" on level 9 now opens level 10, and the chefs no longer crash the game when they can't find a path.
