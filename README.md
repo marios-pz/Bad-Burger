@@ -1,0 +1,77 @@
+# Bad Burger
+
+You are a burger. The chefs want to cook you. Eat all the fruit before they catch you.
+
+Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Greco-France Alliance. Years later I ported it to Godot 4, mostly for the fun of it and so I can upload it to my itch.io page again. The original Pygame version is still here in the `Pygame/` folder, untouched.
+
+## How to play
+
+| Key | What it does |
+| --- | --- |
+| Arrow keys | Walk |
+| Space | Shoot a line of ice, or kick away the ice in front of you |
+| Escape | Pause |
+
+- Eat every fruit to clear a wave. Some levels have two or three waves.
+- Chefs wander around. If you get close they spot you and run after you.
+- Ice blocks the chefs, but if they can't reach you they'll smash through it.
+- You have 2 minutes. After that, fruit is only worth half the points.
+
+## Running the Godot version
+
+1. Install [Godot 4.7](https://godotengine.org/download).
+2. Open this folder in Godot (pick `project.godot`).
+3. Press F5.
+
+To check nothing is broken, run the smoke test:
+
+```sh
+godot --headless --path . res://tests/smoke_test.tscn
+```
+
+It loads all 10 levels, tries the main rules and prints `PASS`.
+
+## Running the original Pygame version
+
+```sh
+cd Pygame
+pip install -r requirements.txt
+python main.py
+```
+
+## What changed in the port
+
+The game should feel the same. Under the hood a few things got simpler:
+
+- All the sprites (about 140 PNG files) are packed into one sheet, `assets/atlas.png`. If you change the art, run `python3 tools/build_atlas.py` to rebuild it.
+- The chefs find their way with Godot's built in pathfinding instead of our own.
+- Pausing really freezes everything now, ice timers included.
+- The music and sound buttons in the menu actually work, and the game remembers your choice.
+- A few old bugs are gone. "Next level" on level 9 now opens level 10, and the chefs no longer crash the game when they can't find a path.
+
+## Project layout
+
+| Folder | What's inside |
+| --- | --- |
+| `scenes/` | The three screens: menu, level select and the game |
+| `scripts/` | All the game code. `global.gd` is shared by every screen |
+| `assets/` | The sprite sheet, font, sounds and the level maps |
+| `tests/` | The smoke test |
+| `tools/` | The script that builds the sprite sheet |
+| `Pygame/` | The original jam version |
+
+The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, `1` is ice, `2` is a furnace and `3` is a counter. In the `fruits_*.txt` files, `1` to `4` are banana, cherry, lemon and grape.
+
+## Building for itch.io
+
+`export_presets.cfg` has Web, Windows and Linux presets. You can export from the Godot editor (Project, Export), or run the "Godot Build" workflow by hand from the GitHub Actions tab and download the builds it makes.
+
+## Credits
+
+- Programming: emc235, fkS, Mario, hk
+- Art: Mario, hk
+- Music: Mario, hk, fkS
+
+## License
+
+GPL 3.0, see [LICENSE](LICENSE).
