@@ -20,6 +20,7 @@ const TIME_LIMIT := 120.0
 const ZOOM := 1.5  ## how close the camera is, 1.0 shows the whole kitchen
 const END_DELAY := 2.0  ## seconds the win or lose animation plays before the popup
 const FRUIT_POINTS := 25.0
+const WAVE_SLOT := 64  ## width of one fruit wave in the bottom HUD box
 const ICE_ALPHA := 180.0 / 255.0
 const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
 const BREAK_ALPHA := 128.0 / 255.0
@@ -32,6 +33,7 @@ var grid := []  ## grid[y][x] is 1 when the cell is blocked
 var blocks := {}  ## Vector2i -> AnimatedSprite2D (counter, furnace or ice)
 var fruits := {}  ## Vector2i -> Sprite2D, only the wave being eaten
 var waves: Array = []  ## fruit kind (1 to 4) of every wave
+var wave_sizes: Array[int] = []  ## how many fruits every wave starts with
 var wave := 0
 var score := 0.0
 var time_left := TIME_LIMIT
@@ -53,6 +55,7 @@ var time_label: Label
 var clock_anim: AnimatedSprite2D
 var wave_box: ReferenceRect
 var wave_icons: Array[Sprite2D] = []
+var wave_counts: Array[Label] = []
 
 
 func _ready() -> void:
@@ -430,12 +433,16 @@ static func _fruit_sprite(kind: int) -> Sprite2D:
 	return f
 
 
-func _first_fruit_kind(file_number: int) -> int:
+## The fruit kind and the number of fruits in one wave file.
+func _wave_info(file_number: int) -> Array:
+	var kind := 0
+	var count := 0
 	for row in G.read_grid("res://assets/levels/level%d/fruits_%d.txt" % [G.level, file_number]):
-		for kind in row:
-			if kind != 0:
-				return kind
-	return 1
+		for k in row:
+			if k != 0:
+				kind = kind if kind else k
+				count += 1
+	return [kind if kind else 1, count]
 
 
 # --- HUD --------------------------------------------------------------------
@@ -444,19 +451,27 @@ func _build_hud() -> void:
 	var ui := Control.new()
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(ui)
-	# Score in a box at the top, fruit waves in a box at the bottom.
+	# Score in a box at the top.
 	G.panel(ui, Rect2(250, 3, 140, 32), "HudPanel")
-	G.panel(ui, Rect2(250, 440, 140, 36), "HudPanel")
 	score_label = G.label(ui, "", 34, Rect2(250, 3, 140, 30))
 
+	# Fruit waves in a box at the bottom: one slot per wave with the fruit
+	# and how many are left (current wave) or coming (later waves).
 	for file_number in G.LEVELS[G.level - 1].waves:
-		waves.append(_first_fruit_kind(file_number))
+		var info := _wave_info(file_number)
+		waves.append(info[0])
+		wave_sizes.append(info[1])
+	var width := waves.size() * WAVE_SLOT + 12
+	var left := (G.W - width) / 2.0 + 6
+	G.panel(ui, Rect2(left - 6, 440, width, 36), "HudPanel")
 	for i in waves.size():
+		var x := left + i * WAVE_SLOT
 		var icon := _fruit_sprite(waves[i])
 		icon.scale *= 0.8
-		icon.position = Vector2(320 - (floori(waves.size() / 2.0) - i) * 32, 456)
+		icon.position = Vector2(x + 17, 456)
 		ui.add_child(icon)
 		wave_icons.append(icon)
+		wave_counts.append(G.label(ui, "", 26, Rect2(x + 36, 442, WAVE_SLOT - 36, 28), HORIZONTAL_ALIGNMENT_LEFT))
 	wave_box = ReferenceRect.new()
 	wave_box.editor_only = false
 	wave_box.border_color = Color(0.784, 0.271, 0.227)
@@ -477,13 +492,19 @@ func _build_hud() -> void:
 func _update_wave_box() -> void:
 	if wave_box == null:
 		return
-	# Same size box for every fruit, centered on the icon.
-	wave_box.size = Vector2(30, 28)
-	wave_box.position = wave_icons[wave].position - wave_box.size / 2.0
+	# The box frames the whole slot of the current wave, fruit and number.
+	wave_box.size = Vector2(WAVE_SLOT - 2, 28)
+	wave_box.position = wave_icons[wave].position + Vector2(-15, -14)
 
 
 func _update_hud() -> void:
 	score_label.text = "%05d" % int(score)
+	for i in waves.size():
+		var left := fruits.size() if i == wave else (wave_sizes[i] if i > wave else 0)
+		wave_counts[i].text = str(left)
+		var faded := 0.35 if i < wave else 1.0  # finished waves fade out
+		wave_icons[i].modulate.a = faded
+		wave_counts[i].modulate.a = faded
 	var t := floori(time_left)
 	time_label.text = "%02d:%02d" % [floori(t / 60.0), t % 60]
 	if time_left <= 0:
