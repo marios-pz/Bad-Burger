@@ -7,6 +7,43 @@ You are a burger. The chefs want to cook you. Eat all the fruit before they catc
 
 Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Greco-France Alliance. Years later I ported it to Godot 4, mostly for the fun of it and so I can upload it to my itch.io page again. If you want the original Pygame code, it's still in the git history, just before the commit that removed it.
 
+## Screenshots
+
+<table>
+<tr>
+<td><img src="docs/screenshots/gameplay.png" alt="Eating fruit while a chef wanders nearby"></td>
+<td><img src="docs/screenshots/making-ice.png" alt="Shooting a line of ice"></td>
+</tr>
+<tr>
+<td align="center">Eating fruit while a chef wanders nearby</td>
+<td align="center">Shooting a line of ice</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/breaking-ice.png" alt="Kicking a row of ice away"></td>
+<td><img src="docs/screenshots/green-chef.png" alt="Chefs on your tail"></td>
+</tr>
+<tr>
+<td align="center">Kicking a row of ice away</td>
+<td align="center">Chefs on your tail</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/menu.png" alt="Main menu"></td>
+<td><img src="docs/screenshots/how-to-play.png" alt="How to play"></td>
+</tr>
+<tr>
+<td align="center">Main menu</td>
+<td align="center">How to play</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/level-select.png" alt="Level select"></td>
+<td><img src="docs/screenshots/you-won.png" alt="Level cleared"></td>
+</tr>
+<tr>
+<td align="center">Level select</td>
+<td align="center">Level cleared</td>
+</tr>
+</table>
+
 ## How to play
 
 | Key | What it does |
@@ -59,6 +96,7 @@ The game should feel the same. Under the hood a few things got simpler:
 | `assets/` | The sprite sheet, UI theme, font, sounds and the level maps |
 | `tests/` | The smoke test |
 | `tools/` | The script that builds the sprite sheet |
+| `docs/screenshots/` | The pictures used in this README |
 | `art/sprites/` | The separate game sprite images, used to build the sheet |
 
 The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, `1` is ice, `2` is a furnace and `3` is a counter. In the `fruits_*.txt` files, `1` to `4` are banana, cherry, lemon and grape.
