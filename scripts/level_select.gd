@@ -1,45 +1,33 @@
 extends Control
-## Level select: 40 buns in a grid, the first 10 are real levels and
-## the rest show a lock, just like the original jam build.
+## Level select: 40 buttons in a grid. Levels 1 to 10 can be played,
+## the rest are greyed out, just like the original jam build.
 
 const SLOTS := 40
 const SIZE := Vector2(41, 40)
-
-var unlocked: Array[TextureButton] = []
-var clock := 0.0
 
 
 func _ready() -> void:
 	size = Vector2(G.W, G.H)
 	draw.connect(G.draw_tables.bind(self))
-	G.image(self, "credits_bg", Rect2(0, 0, G.W, G.H))
-	G.label(self, "level select", 50, Rect2(0, 35, G.W, 55))
+	G.panel(self, Rect2(96, 24, 448, 432))
+	G.label(self, "level select", 40, Rect2(96, 40, 448, 50))
 
-	var pos := Vector2(124, 130)
+	var pos := Vector2(124, 116)
+	var first: Button
 	for i in SLOTS:
 		var number := i + 1
-		var open := number <= G.LEVELS.size()
-		var b := G.button(self, Rect2(pos, SIZE), str(number), 30, Callable(), open)
-		if open:
+		var b := G.button(self, Rect2(pos, SIZE), str(number), 22)
+		if number <= G.LEVELS.size():
 			b.pressed.connect(_play.bind(number))
-			unlocked.append(b)
+			first = first if first else b
 		else:
 			b.disabled = true
-			var lock := G.tex("lock")  # 22x32, shown 35 wide and peeking out the top
-			G.image(b, "lock", Rect2(3, -10, 35, 35.0 * lock.get_height() / lock.get_width()))
 		pos.x += SIZE.x + 10
 		if pos.x >= 500:
 			pos = Vector2(124, pos.y + SIZE.y + 10)
 
-	G.button(self, Rect2(270, G.H - 100, 100, 40), "back", 30, G.go.bind("menu"))
-
-
-func _process(delta: float) -> void:
-	# Unlocked buns flicker between two hover frames while the mouse is on them.
-	clock += delta
-	var frame := G.FRAMES.get_frame_texture("level_hover", int(clock * 10) % 2)
-	for b in unlocked:
-		b.texture_hover = frame
+	G.button(self, Rect2(250, 386, 140, 40), "back", 24, G.go.bind("menu"))
+	first.grab_focus.call_deferred()  # so keyboard and gamepad can pick a level
 
 
 func _unhandled_input(event: InputEvent) -> void:

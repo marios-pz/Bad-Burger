@@ -9,7 +9,7 @@ const SETTINGS_PATH := "user://settings.cfg"
 
 const CREDITS := [
 	"credits",
-	"programing:",
+	"programming:",
 	"emc235 | fkS | Mario | hk",
 	"art:",
 	"Mario | hk",
@@ -96,19 +96,20 @@ func tex(name: String) -> Texture2D:
 	return FRAMES.get_frame_texture(name, 0)
 
 
-func image(parent: Node, name: String, rect: Rect2) -> TextureRect:
-	var t := TextureRect.new()
-	t.texture = tex(name)
-	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	t.stretch_mode = TextureRect.STRETCH_SCALE
-	t.position = rect.position
-	t.size = rect.size
-	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(t)
-	return t
+## A framed box from the UI theme (assets/ui_theme.tres). variation can be
+## "HudPanel" for the slimmer HUD boxes or "KeyCap" / "KeyCapOn" for keys.
+func panel(parent: Node, rect: Rect2, variation := "") -> Panel:
+	var p := Panel.new()
+	p.theme_type_variation = variation
+	p.position = rect.position
+	p.size = rect.size
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(p)
+	return p
 
 
-## Black text centered inside rect (or aligned left/right with align).
+## Text centered inside rect (or aligned left/right with align).
+## The color comes from the theme.
 func label(parent: Node, text: String, font_size: int, rect: Rect2,
 		align := HORIZONTAL_ALIGNMENT_CENTER) -> Label:
 	var l := Label.new()
@@ -117,7 +118,6 @@ func label(parent: Node, text: String, font_size: int, rect: Rect2,
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.add_theme_font_size_override("font_size", font_size)
-	l.add_theme_color_override("font_color", Color.BLACK)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.position = rect.position
 	l.size = rect.size
@@ -125,21 +125,18 @@ func label(parent: Node, text: String, font_size: int, rect: Rect2,
 	return l
 
 
-## The burger bun button used everywhere, with an optional text on top.
-func button(parent: Node, rect: Rect2, text := "", font_size := 30,
-		on_press := Callable(), hover := true) -> TextureButton:
-	var b := TextureButton.new()
-	b.texture_normal = tex("button")
-	b.texture_hover = tex("button_hover" if hover else "button")
-	b.ignore_texture_size = true
-	b.stretch_mode = TextureButton.STRETCH_SCALE
+## A themed button. Hover, pressed, disabled and keyboard focus looks
+## all come from assets/ui_theme.tres.
+func button(parent: Node, rect: Rect2, text: String, font_size := 30,
+		on_press := Callable()) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.add_theme_font_size_override("font_size", font_size)
 	b.position = rect.position
 	b.size = rect.size
 	if on_press.is_valid():
 		b.pressed.connect(on_press)
 	parent.add_child(b)
-	if text:
-		label(b, text, font_size, Rect2(Vector2.ZERO, rect.size))
 	return b
 
 
@@ -152,14 +149,18 @@ func draw_tables(canvas: CanvasItem) -> void:
 			canvas.draw_texture(t, Vector2(x * 32, y * 28))
 
 
-## The small framed window used by the pause, win and lose screens.
+## The small window used by the pause, win and lose screens. The game
+## behind it is dimmed. The first button gets keyboard and gamepad focus.
 ## Returns the layer so the caller can free it.
 func popup(parent: Node, title: String, buttons: Array) -> Control:
-	var layer := Control.new()
+	var layer := ColorRect.new()
+	layer.color = Color(0, 0, 0, 0.45)
 	layer.size = Vector2(W, H)
 	parent.add_child(layer)
-	image(layer, "panel_bg", Rect2(160, 124, 320, 232))
-	label(layer, title, 25, Rect2(0, 195, W, 30))
+	panel(layer, Rect2(180, 140, 280, 200))
+	label(layer, title, 30, Rect2(180, 158, 280, 40))
 	for i in buttons.size():
-		button(layer, Rect2(260, 240 + i * 40, 120, 35), buttons[i][0], 21, buttons[i][1])
+		var b := button(layer, Rect2(240, 214 + i * 52, 160, 42), buttons[i][0], 22, buttons[i][1])
+		if i == 0:
+			b.grab_focus.call_deferred()
 	return layer

@@ -30,7 +30,7 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/custom_font="res://assets/Minecraft.ttf"
+theme/custom="res://assets/ui_theme.tres"
 
 [input]
 

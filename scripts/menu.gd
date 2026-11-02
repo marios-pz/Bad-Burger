@@ -6,8 +6,10 @@ const RUNNERS := 7
 const RUN_SPEED := 300.0  # pixels per second
 const JUMP_TIME := 0.7
 const JUMP_HEIGHT := 192.0
-const SHOWCASE := [["player_walk_down", false, 0.0], ["player_walk_side", false, 90.0],
-	["player_walk_up", false, 180.0], ["player_walk_side", true, -90.0]]
+## The help page burger walks down, left, up, right and the matching key lights up.
+const SHOWCASE := [["player_walk_down", false, "S"], ["player_walk_side", false, "A"],
+	["player_walk_up", false, "W"], ["player_walk_side", true, "D"]]
+const ROLE_COLOR := Color(0.784, 0.271, 0.227)
 
 var runners: Array[AnimatedSprite2D] = []
 var logo: TextureRect
@@ -17,7 +19,7 @@ var help_page: Control
 var credits_page: Control
 var sound_buttons: Control
 var showcase: AnimatedSprite2D
-var arrow: Sprite2D
+var keys := {}  ## letter -> key cap Panel on the help page
 var clock := 0.0
 
 
@@ -33,46 +35,46 @@ func _ready() -> void:
 	add_child(logo)
 
 	sound_buttons = Control.new()
+	sound_buttons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(sound_buttons)
-	_sound_button(Vector2(G.W - 35, 5), "music")
-	_sound_button(Vector2(G.W - 67, 4), "sfx")
+	_sound_button(Rect2(G.W - 220, 8, 112, 30), "music")
+	_sound_button(Rect2(G.W - 102, 8, 94, 30), "sfx")
 
 	title_page = _page()
-	G.button(title_page, Rect2(235, 295, 170, 40), "click to eat", 30, _open_main)
+	G.button(title_page, Rect2(215, 300, 210, 48), "click to eat", 26, _open_main)
 
 	main_page = _page()
-	G.button(main_page, Rect2(270, 295, 100, 40), "play", 30, G.go.bind("level_select"))
-	G.button(main_page, Rect2(265, 340, 110, 40), "help", 30, _show.bind("help"))
-	G.button(main_page, Rect2(250, 385, 140, 40), "credits", 30, _show.bind("credits"))
-	G.button(main_page, Rect2(270, 430, 100, 40), "quit", 30, get_tree().quit)
+	G.button(main_page, Rect2(240, 288, 160, 40), "play", 24, G.go.bind("level_select"))
+	G.button(main_page, Rect2(240, 334, 160, 40), "help", 24, _show.bind("help"))
+	G.button(main_page, Rect2(240, 380, 160, 40), "credits", 24, _show.bind("credits"))
+	G.button(main_page, Rect2(240, 426, 160, 40), "quit", 24, get_tree().quit)
 
-	credits_page = _page()
-	G.image(credits_page, "credits_bg", Rect2(0, 0, 640, 464))
-	var line_h := 30
-	var top := 50 + (380 - line_h * G.CREDITS.size()) / 2
-	for i in G.CREDITS.size():
-		G.label(credits_page, G.CREDITS[i], 30, Rect2(0, top + i * line_h, G.W, line_h))
-	G.button(credits_page, Rect2(270, 350, 100, 40), "back", 30, _show.bind("main"))
+	credits_page = _dimmed_page()
+	G.panel(credits_page, Rect2(140, 40, 360, 400))
+	G.label(credits_page, G.CREDITS[0], 34, Rect2(140, 54, 360, 44))
+	for i in range(1, G.CREDITS.size()):
+		var line := G.label(credits_page, G.CREDITS[i], 22, Rect2(140, 80 + i * 36, 360, 32))
+		if G.CREDITS[i].ends_with(":"):
+			line.add_theme_color_override("font_color", ROLE_COLOR)
+	G.button(credits_page, Rect2(250, 376, 140, 40), "back", 24, _show.bind("main"))
 
-	help_page = _page()
-	G.image(help_page, "credits_bg", Rect2(0, 0, 640, 464))
-	G.image(help_page, "panel_bg", Rect2(160, 94, 320, 232))
-	G.label(help_page, "moving", 40, Rect2(0, 155, G.W, 45))
-	G.label(help_page, "arrows or wasd: move\nspace: make or break ice", 15,
-		Rect2(212, 246, 216, 52))
+	help_page = _dimmed_page()
+	G.panel(help_page, Rect2(110, 40, 420, 400))
+	G.label(help_page, "how to play", 32, Rect2(110, 52, 420, 40))
 	showcase = AnimatedSprite2D.new()
 	showcase.sprite_frames = G.FRAMES
-	showcase.position = Vector2(G.W / 2.0, 216)
+	showcase.position = Vector2(220, 146)
+	showcase.scale = Vector2(2, 2)
 	help_page.add_child(showcase)
-	arrow = Sprite2D.new()
-	arrow.texture = G.tex("arrow")
-	arrow.scale = Vector2(2, 2)
-	arrow.position = Vector2(350, 215)
-	help_page.add_child(arrow)
-	G.button(help_page, Rect2(270, 350, 100, 40), "back", 30, _show.bind("main"))
-	# Two empty buns next to "back", kept from the original layout.
-	G.button(help_page, Rect2(220, 350, 40, 40))
-	G.button(help_page, Rect2(380, 350, 40, 40))
+	for k in [["W", 400, 102], ["A", 360, 142], ["S", 400, 142], ["D", 440, 142]]:
+		keys[k[0]] = _key(Rect2(k[1], k[2], 36, 36), k[0])
+	G.label(help_page, "walk with wasd or the arrow keys", 16, Rect2(110, 190, 420, 24))
+	_key(Rect2(150, 228, 120, 32), "space")
+	G.label(help_page, "make or break ice", 16, Rect2(284, 228, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
+	_key(Rect2(150, 272, 120, 32), "esc")
+	G.label(help_page, "pause", 16, Rect2(284, 272, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
+	G.label(help_page, "eat all the fruit and dodge the chefs!", 16, Rect2(130, 316, 380, 40))
+	G.button(help_page, Rect2(250, 376, 140, 40), "back", 24, _show.bind("main"))
 
 	_show("main" if G.menu_opened else "title")
 
@@ -86,7 +88,8 @@ func _process(delta: float) -> void:
 		var step: Array = SHOWCASE[int(clock / 0.8) % 4]
 		showcase.play(step[0])
 		showcase.flip_h = step[1]
-		arrow.rotation_degrees = step[2]
+		for letter in keys:
+			keys[letter].theme_type_variation = "KeyCapOn" if letter == step[2] else "KeyCap"
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -102,6 +105,22 @@ func _page() -> Control:
 	return page
 
 
+## A page that darkens the menu behind it, used by help and credits.
+func _dimmed_page() -> Control:
+	var page := ColorRect.new()
+	page.color = Color(0, 0, 0, 0.45)
+	page.size = size
+	add_child(page)
+	return page
+
+
+## A keyboard key drawn as a small box with its name on it.
+func _key(rect: Rect2, text: String) -> Panel:
+	var cap := G.panel(help_page, rect, "KeyCap")
+	G.label(cap, text, 18, Rect2(Vector2(0, -1), rect.size))
+	return cap
+
+
 func _show(page: String) -> void:
 	title_page.visible = page == "title"
 	main_page.visible = page == "main"
@@ -115,13 +134,12 @@ func _open_main() -> void:
 	_show("main")
 
 
-func _sound_button(pos: Vector2, kind: String) -> void:
-	var b := TextureButton.new()
-	b.position = pos
-	sound_buttons.add_child(b)
+## Small on/off switch for music or sound effects, saved right away.
+func _sound_button(rect: Rect2, kind: String) -> void:
+	var b := G.button(sound_buttons, rect, "", 16)
 	var refresh := func():
 		var on: bool = G.music_on if kind == "music" else G.sfx_on
-		b.texture_normal = G.tex("%s_%s" % [kind, "on" if on else "off"])
+		b.text = "%s: %s" % [kind, "on" if on else "off"]
 	refresh.call()
 	b.pressed.connect(func():
 		if kind == "music":

@@ -1,0 +1,173 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontFile" path="res://assets/Minecraft.ttf" id="font"]
+
+[sub_resource type="StyleBoxFlat" id="button_normal"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.784, 0.271, 0.227, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="button_hover"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.871, 0.357, 0.302, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="button_pressed"]
+content_margin_left = 8.0
+content_margin_top = 5.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+bg_color = Color(0.651, 0.208, 0.173, 1)
+border_width_left = 3
+border_width_top = 6
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="button_disabled"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.541, 0.459, 0.396, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="button_focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.949, 0.702, 0.239, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 2
+expand_margin_left = 3.0
+expand_margin_top = 3.0
+expand_margin_right = 3.0
+expand_margin_bottom = 3.0
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+bg_color = Color(0.965, 0.906, 0.784, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 8
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="hud"]
+bg_color = Color(0.965, 0.906, 0.784, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="key"]
+bg_color = Color(0.965, 0.906, 0.784, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="key_on"]
+bg_color = Color(0.949, 0.702, 0.239, 1)
+border_width_left = 3
+border_width_top = 5
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.169, 0.102, 0.071, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 2
+anti_aliasing = false
+
+[resource]
+default_font = ExtResource("font")
+default_font_size = 20
+Button/colors/font_color = Color(0.965, 0.906, 0.784, 1)
+Button/colors/font_hover_color = Color(1, 0.973, 0.906, 1)
+Button/colors/font_pressed_color = Color(0.965, 0.906, 0.784, 1)
+Button/colors/font_hover_pressed_color = Color(0.965, 0.906, 0.784, 1)
+Button/colors/font_focus_color = Color(1, 0.973, 0.906, 1)
+Button/colors/font_disabled_color = Color(0.792, 0.722, 0.612, 1)
+Button/styles/normal = SubResource("button_normal")
+Button/styles/hover = SubResource("button_hover")
+Button/styles/pressed = SubResource("button_pressed")
+Button/styles/hover_pressed = SubResource("button_pressed")
+Button/styles/disabled = SubResource("button_disabled")
+Button/styles/focus = SubResource("button_focus")
+HudPanel/base_type = &"Panel"
+HudPanel/styles/panel = SubResource("hud")
+KeyCap/base_type = &"Panel"
+KeyCap/styles/panel = SubResource("key")
+KeyCapOn/base_type = &"Panel"
+KeyCapOn/styles/panel = SubResource("key_on")
+Label/colors/font_color = Color(0.169, 0.102, 0.071, 1)
+Panel/styles/panel = SubResource("panel")

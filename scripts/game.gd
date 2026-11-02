@@ -311,43 +311,42 @@ func _build_hud() -> void:
 	var ui := Control.new()
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(ui)
-	# Score on a bar at the top, fruit waves on a bar at the bottom.
-	G.image(ui, "fruit_bar", Rect2(192, 0, 256, 33))
-	G.image(ui, "fruit_bar", Rect2(192, 442, 256, 33))
-	score_label = G.label(ui, "", 25, Rect2(192, 2, 256, 30))
+	# Score in a box at the top, fruit waves in a box at the bottom.
+	G.panel(ui, Rect2(250, 3, 140, 32), "HudPanel")
+	G.panel(ui, Rect2(250, 440, 140, 36), "HudPanel")
+	score_label = G.label(ui, "", 24, Rect2(250, 3, 140, 30))
 
 	for file_number in G.LEVELS[G.level - 1].waves:
 		waves.append(_first_fruit_kind(file_number))
 	for i in waves.size():
 		var icon := _fruit_sprite(waves[i])
 		icon.scale *= 0.8
-		icon.position = Vector2(320 - (floori(waves.size() / 2.0) - i) * 32, 458.5)
+		icon.position = Vector2(320 - (floori(waves.size() / 2.0) - i) * 32, 456)
 		ui.add_child(icon)
 		wave_icons.append(icon)
 	wave_box = ReferenceRect.new()
 	wave_box.editor_only = false
-	wave_box.border_color = Color.BLACK
+	wave_box.border_color = Color(0.784, 0.271, 0.227)
 	wave_box.border_width = 2
 	ui.add_child(wave_box)
 
 	# Countdown clock in the top right corner.
-	G.image(ui, "clock_ui", Rect2(538, 5, 97, 28))
+	G.panel(ui, Rect2(532, 3, 104, 32), "HudPanel")
 	clock_anim = AnimatedSprite2D.new()
 	clock_anim.sprite_frames = G.FRAMES
 	clock_anim.centered = false
-	clock_anim.position = Vector2(544, 6)
+	clock_anim.position = Vector2(537, 5)
 	clock_anim.play("clock")
 	ui.add_child(clock_anim)
-	time_label = G.label(ui, "", 20, Rect2(500, 7, 123, 24), HORIZONTAL_ALIGNMENT_RIGHT)
+	time_label = G.label(ui, "", 20, Rect2(560, 3, 70, 30), HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 func _update_wave_box() -> void:
 	if wave_box == null:
 		return
-	var icon := wave_icons[wave]
-	var half := icon.texture.get_size() * icon.scale / 2.0
-	wave_box.position = icon.position - half - Vector2(2, 2)
-	wave_box.size = half * 2 + Vector2(4, 4)
+	# Same size box for every fruit, centered on the icon.
+	wave_box.size = Vector2(30, 28)
+	wave_box.position = wave_icons[wave].position - wave_box.size / 2.0
 
 
 func _update_hud() -> void:
