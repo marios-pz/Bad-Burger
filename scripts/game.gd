@@ -8,6 +8,7 @@ const COLS := 20
 const ROWS := 15
 const FLOOR := Color8(80, 38, 19)
 const TIME_LIMIT := 120.0
+const END_DELAY := 2.0  ## seconds the win or lose animation plays before the popup
 const FRUIT_POINTS := 25.0
 const ICE_ALPHA := 180.0 / 255.0
 const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
@@ -31,6 +32,8 @@ var astar := AStarGrid2D.new()
 var fruit_layer := Node2D.new()
 var world := Node2D.new()  ## everything that stands on the floor, sorted by height
 var hud := CanvasLayer.new()
+var overlay := CanvasLayer.new()  ## pause and end popups, still runs while paused
+var popup: Control
 var score_label: Label
 var time_label: Label
 var clock_anim: AnimatedSprite2D
@@ -39,10 +42,16 @@ var wave_icons: Array[Sprite2D] = []
 
 
 func _ready() -> void:
+	# The level root keeps running while paused so Escape can resume, the
+	# board and HUD below it freeze.
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	for layer in [fruit_layer, world, hud]:
+		layer.process_mode = Node.PROCESS_MODE_PAUSABLE
+		add_child(layer)
 	world.y_sort_enabled = true
-	add_child(fruit_layer)
-	add_child(world)
-	add_child(hud)
+	overlay.layer = 2
+	add_child(overlay)
+	_start_music()
 	_load_map()
 	_build_hud()
 	_load_wave()
@@ -60,6 +69,10 @@ func _draw() -> void:
 
 
 func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("ui_cancel") and not over:
+		_toggle_pause()
+	if get_tree().paused:
+		return
 	time_left = maxf(time_left - delta, 0.0)
 	_eat_fruit()
 	if not over and _enemy_at(player.cell):
@@ -83,6 +96,40 @@ func finish(won: bool) -> void:
 	player.finish(won)
 	if won:
 		G.sfx("win")
+	await get_tree().create_timer(END_DELAY, false).timeout
+	var last := G.level >= G.LEVELS.size()
+	var next := ["levels" if last else "next level", _next_level]
+	popup = G.popup(overlay, "You Won !" if won else "You Lost !",
+		[next if won else ["restart", G.go.bind("game")], ["quit", G.go.bind("menu")]])
+	get_tree().paused = true
+
+
+func _toggle_pause() -> void:
+	get_tree().paused = not get_tree().paused
+	if get_tree().paused:
+		popup = G.popup(overlay, "GAME PAUSED", [["resume", _toggle_pause], ["quit", G.go.bind("menu")]])
+	else:
+		popup.queue_free()
+
+
+## After the last level there is no next one, so go back to the list.
+func _next_level() -> void:
+	if G.level >= G.LEVELS.size():
+		G.go("level_select")
+	else:
+		G.level += 1
+		G.go("game")
+
+
+func _start_music() -> void:
+	if not G.music_on:
+		return
+	var music := AudioStreamPlayer.new()
+	music.stream = preload("res://assets/sfx/boil.wav")
+	music.volume_db = linear_to_db(0.2)
+	music.finished.connect(music.play)  # loop
+	add_child(music)
+	music.play()
 
 
 # --- Grid -------------------------------------------------------------------

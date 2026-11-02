@@ -161,5 +161,5 @@ func popup(parent: Node, title: String, buttons: Array) -> Control:
 	image(layer, "panel_bg", Rect2(160, 124, 320, 232))
 	label(layer, title, 25, Rect2(0, 195, W, 30))
 	for i in buttons.size():
-		button(layer, Rect2(260, 240 + i * 40, 120, 35), buttons[i][0], 25, buttons[i][1])
+		button(layer, Rect2(260, 240 + i * 40, 120, 35), buttons[i][0], 21, buttons[i][1])
 	return layer
