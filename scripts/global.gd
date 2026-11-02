@@ -127,7 +127,7 @@ func label(parent: Node, text: String, font_size: int, rect: Rect2,
 
 ## A themed button. Hover, pressed, disabled and keyboard focus looks
 ## all come from assets/ui_theme.tres.
-func button(parent: Node, rect: Rect2, text: String, font_size := 30,
+func button(parent: Node, rect: Rect2, text: String, font_size := 42,
 		on_press := Callable()) -> Button:
 	var b := Button.new()
 	b.text = text
@@ -158,9 +158,9 @@ func popup(parent: Node, title: String, buttons: Array) -> Control:
 	layer.size = Vector2(W, H)
 	parent.add_child(layer)
 	panel(layer, Rect2(180, 140, 280, 200))
-	label(layer, title, 30, Rect2(180, 158, 280, 40))
+	label(layer, title, 42, Rect2(180, 158, 280, 40))
 	for i in buttons.size():
-		var b := button(layer, Rect2(240, 214 + i * 52, 160, 42), buttons[i][0], 22, buttons[i][1])
+		var b := button(layer, Rect2(240, 214 + i * 52, 160, 42), buttons[i][0], 31, buttons[i][1])
 		if i == 0:
 			b.grab_focus.call_deferred()
 	return layer

@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bt8u8ij6sdkl6"
-path="res://.godot/imported/Minecraft.ttf-b8ba55381f56f287bfe65ce675c9164b.fontdata"
+uid="uid://ceqxibkgwm4m3"
+path="res://.godot/imported/Jersey10-Regular.ttf-200460e514ca6d2634756f713ee1b38e.fontdata"
 
 [deps]
 
-source_file="res://assets/Minecraft.ttf"
-dest_files=["res://.godot/imported/Minecraft.ttf-b8ba55381f56f287bfe65ce675c9164b.fontdata"]
+source_file="res://assets/fonts/Jersey10-Regular.ttf"
+dest_files=["res://.godot/imported/Jersey10-Regular.ttf-200460e514ca6d2634756f713ee1b38e.fontdata"]
 
 [params]
 

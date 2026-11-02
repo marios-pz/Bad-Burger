@@ -10,13 +10,13 @@ func _ready() -> void:
 	size = Vector2(G.W, G.H)
 	draw.connect(G.draw_tables.bind(self))
 	G.panel(self, Rect2(96, 24, 448, 432))
-	G.label(self, "level select", 40, Rect2(96, 40, 448, 50))
+	G.label(self, "level select", 56, Rect2(96, 40, 448, 50))
 
 	var pos := Vector2(124, 116)
 	var first: Button
 	for i in SLOTS:
 		var number := i + 1
-		var b := G.button(self, Rect2(pos, SIZE), str(number), 22)
+		var b := G.button(self, Rect2(pos, SIZE), str(number), 31)
 		if number <= G.LEVELS.size():
 			b.pressed.connect(_play.bind(number))
 			first = first if first else b
@@ -26,7 +26,7 @@ func _ready() -> void:
 		if pos.x >= 500:
 			pos = Vector2(124, pos.y + SIZE.y + 10)
 
-	G.button(self, Rect2(250, 386, 140, 40), "back", 24, G.go.bind("menu"))
+	G.button(self, Rect2(250, 386, 140, 40), "back", 34, G.go.bind("menu"))
 	first.grab_focus.call_deferred()  # so keyboard and gamepad can pick a level
 
 

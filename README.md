@@ -66,7 +66,8 @@ The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, 
 - Programming: emc235, fkS, Mario, hk
 - Art: Mario, hk
 - Music: Mario, hk, fkS
+- Font: [Jersey 10](https://github.com/scfried/soft-type-jersey) by The Soft Type Project Authors, under the SIL Open Font License 1.1 (see `assets/fonts/OFL.txt`)
 
 ## License
 
-GPL 3.0, see [LICENSE](LICENSE).
+The game is GPL 3.0, see [LICENSE](LICENSE). The font keeps its own license, the SIL Open Font License 1.1.

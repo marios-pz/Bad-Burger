@@ -41,26 +41,26 @@ func _ready() -> void:
 	_sound_button(Rect2(G.W - 102, 8, 94, 30), "sfx")
 
 	title_page = _page()
-	G.button(title_page, Rect2(215, 300, 210, 48), "click to eat", 26, _open_main)
+	G.button(title_page, Rect2(215, 300, 210, 48), "click to eat", 36, _open_main)
 
 	main_page = _page()
-	G.button(main_page, Rect2(240, 288, 160, 40), "play", 24, G.go.bind("level_select"))
-	G.button(main_page, Rect2(240, 334, 160, 40), "help", 24, _show.bind("help"))
-	G.button(main_page, Rect2(240, 380, 160, 40), "credits", 24, _show.bind("credits"))
-	G.button(main_page, Rect2(240, 426, 160, 40), "quit", 24, get_tree().quit)
+	G.button(main_page, Rect2(240, 288, 160, 40), "play", 34, G.go.bind("level_select"))
+	G.button(main_page, Rect2(240, 334, 160, 40), "help", 34, _show.bind("help"))
+	G.button(main_page, Rect2(240, 380, 160, 40), "credits", 34, _show.bind("credits"))
+	G.button(main_page, Rect2(240, 426, 160, 40), "quit", 34, get_tree().quit)
 
 	credits_page = _dimmed_page()
 	G.panel(credits_page, Rect2(140, 40, 360, 400))
-	G.label(credits_page, G.CREDITS[0], 34, Rect2(140, 54, 360, 44))
+	G.label(credits_page, G.CREDITS[0], 48, Rect2(140, 54, 360, 44))
 	for i in range(1, G.CREDITS.size()):
-		var line := G.label(credits_page, G.CREDITS[i], 22, Rect2(140, 80 + i * 36, 360, 32))
+		var line := G.label(credits_page, G.CREDITS[i], 31, Rect2(140, 80 + i * 36, 360, 32))
 		if G.CREDITS[i].ends_with(":"):
 			line.add_theme_color_override("font_color", ROLE_COLOR)
-	G.button(credits_page, Rect2(250, 376, 140, 40), "back", 24, _show.bind("main"))
+	G.button(credits_page, Rect2(250, 376, 140, 40), "back", 34, _show.bind("main"))
 
 	help_page = _dimmed_page()
 	G.panel(help_page, Rect2(110, 40, 420, 400))
-	G.label(help_page, "how to play", 32, Rect2(110, 52, 420, 40))
+	G.label(help_page, "how to play", 45, Rect2(110, 52, 420, 40))
 	showcase = AnimatedSprite2D.new()
 	showcase.sprite_frames = G.FRAMES
 	showcase.position = Vector2(220, 146)
@@ -68,13 +68,13 @@ func _ready() -> void:
 	help_page.add_child(showcase)
 	for k in [["W", 400, 102], ["A", 360, 142], ["S", 400, 142], ["D", 440, 142]]:
 		keys[k[0]] = _key(Rect2(k[1], k[2], 36, 36), k[0])
-	G.label(help_page, "walk with wasd or the arrow keys", 16, Rect2(110, 190, 420, 24))
+	G.label(help_page, "walk with wasd or the arrow keys", 22, Rect2(110, 190, 420, 24))
 	_key(Rect2(150, 228, 120, 32), "space")
-	G.label(help_page, "make or break ice", 16, Rect2(284, 228, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
+	G.label(help_page, "make or break ice", 22, Rect2(284, 228, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
 	_key(Rect2(150, 272, 120, 32), "esc")
-	G.label(help_page, "pause", 16, Rect2(284, 272, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
-	G.label(help_page, "eat all the fruit and dodge the chefs!", 16, Rect2(130, 316, 380, 40))
-	G.button(help_page, Rect2(250, 376, 140, 40), "back", 24, _show.bind("main"))
+	G.label(help_page, "pause", 22, Rect2(284, 272, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
+	G.label(help_page, "eat all the fruit and dodge the chefs!", 22, Rect2(130, 316, 380, 40))
+	G.button(help_page, Rect2(250, 376, 140, 40), "back", 34, _show.bind("main"))
 
 	_show("main" if G.menu_opened else "title")
 
@@ -117,7 +117,7 @@ func _dimmed_page() -> Control:
 ## A keyboard key drawn as a small box with its name on it.
 func _key(rect: Rect2, text: String) -> Panel:
 	var cap := G.panel(help_page, rect, "KeyCap")
-	G.label(cap, text, 18, Rect2(Vector2(0, -1), rect.size))
+	G.label(cap, text, 25, Rect2(Vector2(0, -1), rect.size))
 	return cap
 
 
@@ -136,7 +136,7 @@ func _open_main() -> void:
 
 ## Small on/off switch for music or sound effects, saved right away.
 func _sound_button(rect: Rect2, kind: String) -> void:
-	var b := G.button(sound_buttons, rect, "", 16)
+	var b := G.button(sound_buttons, rect, "", 22)
 	var refresh := func():
 		var on: bool = G.music_on if kind == "music" else G.sfx_on
 		b.text = "%s: %s" % [kind, "on" if on else "off"]

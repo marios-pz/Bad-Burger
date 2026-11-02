@@ -314,7 +314,7 @@ func _build_hud() -> void:
 	# Score in a box at the top, fruit waves in a box at the bottom.
 	G.panel(ui, Rect2(250, 3, 140, 32), "HudPanel")
 	G.panel(ui, Rect2(250, 440, 140, 36), "HudPanel")
-	score_label = G.label(ui, "", 24, Rect2(250, 3, 140, 30))
+	score_label = G.label(ui, "", 34, Rect2(250, 3, 140, 30))
 
 	for file_number in G.LEVELS[G.level - 1].waves:
 		waves.append(_first_fruit_kind(file_number))
@@ -338,7 +338,7 @@ func _build_hud() -> void:
 	clock_anim.position = Vector2(537, 5)
 	clock_anim.play("clock")
 	ui.add_child(clock_anim)
-	time_label = G.label(ui, "", 20, Rect2(560, 3, 70, 30), HORIZONTAL_ALIGNMENT_RIGHT)
+	time_label = G.label(ui, "", 28, Rect2(560, 3, 70, 30), HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 func _update_wave_box() -> void:
