@@ -41,6 +41,8 @@ The game should feel the same. Under the hood a few things got simpler:
 - The menus, popups and HUD use a Godot theme, `assets/ui_theme.tres`, instead of drawn images. Open it in the Godot editor to change colors, borders or fonts everywhere at once. Menus also work with a keyboard or a gamepad now.
 - The chefs find their way with Godot's built in pathfinding instead of our own.
 - The camera follows the burger, zoomed in 1.5 times so the kitchen feels closer. Change `ZOOM` at the top of `scripts/game.gd` to zoom in or out, 1.0 shows the whole kitchen like the original.
+- Walking feels smoother: the newest key wins, quick taps are never lost, you can turn back halfway through a step, and there is no tiny stop on every cell.
+- The floor is a checkerboard of dirt tiles, so you can see the grid you walk on.
 - Pausing really freezes everything now, ice timers included.
 - The music and sound buttons in the menu actually work, and the game remembers your choice.
 - A few old bugs are gone. "Next level" on level 9 now opens level 10, and the chefs no longer crash the game when they can't find a path.

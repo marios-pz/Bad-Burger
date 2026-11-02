@@ -6,7 +6,12 @@ extends Node2D
 const TILE := 32
 const COLS := 20
 const ROWS := 15
-const FLOOR := Color8(80, 38, 19)
+## Floor tiles: a checkerboard of two dirt tones with dark grout lines and
+## a light top edge, so every cell of the grid is easy to see.
+const FLOOR_A := Color8(96, 48, 24)
+const FLOOR_B := Color8(84, 41, 20)
+const FLOOR_GROUT := Color8(52, 24, 11)
+const FLOOR_SHINE := Color8(112, 60, 32)
 const TIME_LIMIT := 120.0
 const ZOOM := 1.5  ## how close the camera is, 1.0 shows the whole kitchen
 const END_DELAY := 2.0  ## seconds the win or lose animation plays before the popup
@@ -67,7 +72,13 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, COLS * TILE, ROWS * TILE), FLOOR)
+	for y in ROWS:
+		for x in COLS:
+			var r := Rect2(x * TILE, y * TILE, TILE, TILE)
+			draw_rect(r, FLOOR_A if (x + y) % 2 == 0 else FLOOR_B)
+			draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(TILE - 1, 1)), FLOOR_SHINE)
+			draw_rect(Rect2(r.position, Vector2(TILE, 1)), FLOOR_GROUT)
+			draw_rect(Rect2(r.position, Vector2(1, TILE)), FLOOR_GROUT)
 
 
 func _process(delta: float) -> void:
