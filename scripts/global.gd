@@ -18,7 +18,7 @@ const CREDITS := [
 ]
 
 ## Start cell, enemy spawn cells and the fruit waves of every level,
-## copied from Pygame/src/levels.py. Waves are eaten in this order.
+## copied from levels.py of the original Pygame game. Waves are eaten in this order.
 const LEVELS := [
 	{start = Vector2i(2, 1), enemies = [Vector2i(19, 2)], waves = [1]},
 	{start = Vector2i(2, 3), enemies = [Vector2i(3, 13), Vector2i(18, 3)], waves = [1]},

@@ -1,4 +1,4 @@
-"""Packs every sprite from the Pygame version into one atlas for Godot.
+"""Packs every sprite from art/sprites into one atlas for Godot.
 
 Run it from the repo root:  python3 tools/build_atlas.py
 
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from PIL import Image
 
-SRC = Path("Pygame/data/assets")
+SRC = Path("art/sprites")
 OUT = Path("assets")
 ATLAS_WIDTH = 1024
 PAD = 2  # empty pixels between sprites so neighbours never bleed in

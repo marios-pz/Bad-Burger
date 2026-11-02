@@ -2,7 +2,7 @@
 
 You are a burger. The chefs want to cook you. Eat all the fruit before they catch you.
 
-Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Greco-France Alliance. Years later I ported it to Godot 4, mostly for the fun of it and so I can upload it to my itch.io page again. The original Pygame version is still here in the `Pygame/` folder, untouched.
+Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Greco-France Alliance. Years later I ported it to Godot 4, mostly for the fun of it and so I can upload it to my itch.io page again. If you want the original Pygame code, it's still in the git history, just before the commit that removed it.
 
 ## How to play
 
@@ -31,19 +31,11 @@ godot --headless --path . res://tests/smoke_test.tscn
 
 It loads all 10 levels, tries the main rules and prints `PASS`.
 
-## Running the original Pygame version
-
-```sh
-cd Pygame
-pip install -r requirements.txt
-python main.py
-```
-
 ## What changed in the port
 
 The game should feel the same. Under the hood a few things got simpler:
 
-- All the sprites (about 140 PNG files) are packed into one sheet, `assets/atlas.png`. If you change the art, run `python3 tools/build_atlas.py` to rebuild it.
+- All the sprites (about 140 PNG files) are packed into one sheet, `assets/atlas.png`. The original images live in `art/sprites/`. If you change them, run `python3 tools/build_atlas.py` to rebuild the sheet.
 - The chefs find their way with Godot's built in pathfinding instead of our own.
 - Pausing really freezes everything now, ice timers included.
 - The music and sound buttons in the menu actually work, and the game remembers your choice.
@@ -58,7 +50,7 @@ The game should feel the same. Under the hood a few things got simpler:
 | `assets/` | The sprite sheet, font, sounds and the level maps |
 | `tests/` | The smoke test |
 | `tools/` | The script that builds the sprite sheet |
-| `Pygame/` | The original jam version |
+| `art/sprites/` | The original separate sprite images, used to build the sheet |
 
 The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, `1` is ice, `2` is a furnace and `3` is a counter. In the `fruits_*.txt` files, `1` to `4` are banana, cherry, lemon and grape.
 
