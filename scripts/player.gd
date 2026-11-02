@@ -1,6 +1,10 @@
 extends Actor
 ## The burger. Arrow keys or WASD walk one cell at a time. Space shoots a line of
 ## ice in front of it, or kicks away the line of ice it is facing.
+##
+## In co-op each burger reads its own keys: controls "p1_" is WASD and
+## space, "p2_" is the arrow keys and enter (see Project Settings, Input
+## Map). Solo play uses "", which listens to all of them.
 
 const CAST_MS := 500  ## the cast animation, the burger can not walk meanwhile
 const BUFFER_MS := 150  ## a key pressed this long before the burger is ready still counts
@@ -12,6 +16,7 @@ const MOVES := {
 var casting_until := 0
 var cooldown_until := 0
 var cooldown_dir := Vector2i.ZERO
+var controls := ""  ## input action prefix: "", "p1_" or "p2_", set before spawning
 var done := false  ## the level is over, only the win or lose animation plays
 var held: Array[Vector2i] = []  ## directions being held, the newest one last
 var queued_dir := Vector2i.ZERO  ## last direction pressed, kept for a moment
@@ -64,8 +69,9 @@ func _process(delta: float) -> void:
 ## Keeps a list of held directions so the newest key always wins, and
 ## remembers taps and space presses for a short moment.
 func _read_input(now: int) -> void:
-	for action in MOVES:
-		var d: Vector2i = MOVES[action]
+	for move in MOVES:
+		var d: Vector2i = MOVES[move]
+		var action: String = controls + move
 		if Input.is_action_just_pressed(action):
 			held.erase(d)
 			held.append(d)
@@ -73,7 +79,7 @@ func _read_input(now: int) -> void:
 			queued_at = now
 		elif not Input.is_action_pressed(action):
 			held.erase(d)
-	if Input.is_action_just_pressed("cast"):
+	if Input.is_action_just_pressed(controls + "cast"):
 		cast_at = now
 
 
@@ -111,3 +117,4 @@ func finish(won: bool) -> void:
 	play("player_win" if won else "player_dying")
 	if not won:
 		G.sfx("death", 0.3)
+
