@@ -1,0 +1,73 @@
+name: "Godot Build"
+
+# Every push runs the smoke test.
+# Run it by hand from the Actions tab to also get the Web, Windows and
+# Linux builds, ready to upload to itch.io.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        run: |
+          curl -sSLo godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+
+      - name: Import the project
+        run: godot --headless --path . --import
+
+      - name: Smoke test
+        run: godot --headless --path . res://tests/smoke_test.tscn
+
+  export:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and the export templates
+        run: |
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          curl -sSLo godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          curl -sSLo templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates
+          mv templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Export
+        run: |
+          godot --headless --path . --import
+          mkdir -p build/web build/windows build/linux
+          godot --headless --path . --export-release "Web" build/web/index.html
+          godot --headless --path . --export-release "Windows Desktop" build/windows/BadBurger.exe
+          godot --headless --path . --export-release "Linux" build/linux/BadBurger.x86_64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bad-burger-web
+          path: build/web
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bad-burger-windows
+          path: build/windows
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bad-burger-linux
+          path: build/linux
