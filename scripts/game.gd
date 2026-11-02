@@ -63,8 +63,11 @@ func _ready() -> void:
 	_load_wave()
 	player = _spawn(PlayerScript, G.LEVELS[G.level - 1].start)
 	_add_camera()
-	for c in G.LEVELS[G.level - 1].enemies:
+	var level: Dictionary = G.LEVELS[G.level - 1]
+	for c in level.enemies:
 		enemies.append(_spawn(EnemyScript, c))
+	for c in level.get("green", []):
+		enemies.append(_spawn(EnemyScript, c, {kind = "green"}))
 	astar.region = Rect2i(0, 0, COLS, ROWS)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
@@ -108,9 +111,13 @@ func _add_camera() -> void:
 	cam.reset_smoothing()
 
 
-func _spawn(script: Script, c: Vector2i) -> Actor:
+## Creates the burger or a chef on cell c. props are set before it
+## enters the level, for example {kind = "green"} for a green chef.
+func _spawn(script: Script, c: Vector2i, props := {}) -> Actor:
 	var a: Actor = script.new()
 	a.game = self
+	for key in props:
+		a.set(key, props[key])
 	a.place(c)
 	world.add_child(a)
 	return a

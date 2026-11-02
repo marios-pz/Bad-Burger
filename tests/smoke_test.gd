@@ -34,7 +34,13 @@ func _ready() -> void:
 		var game := load_level(n)
 		check(game.is_free(game.player.cell), "level %d: burger starts on a free cell" % n)
 		check(not game.fruits.is_empty(), "level %d: has fruit" % n)
-		check(game.enemies.size() == G.LEVELS[n - 1].enemies.size(), "level %d: all chefs spawned" % n)
+		var expected: int = G.LEVELS[n - 1].enemies.size() + G.LEVELS[n - 1].get("green", []).size()
+		check(game.enemies.size() == expected, "level %d: all chefs spawned" % n)
+		var greens := game.enemies.filter(func(e): return e.kind == "green").size()
+		check((greens > 0) == (n >= 5), "level %d: green chefs only from level 5 on" % n)
+		for e in game.enemies:
+			if e.kind == "green":
+				check(not e.sees_player(), "level %d: the green chef does not see the burger at the start" % n)
 		for e in game.enemies:
 			var path := game.find_path(e.cell, game.player.cell, true)
 			check(path.size() >= 2, "level %d: chef at %s can reach the burger through ice" % [n, e.cell])

@@ -17,19 +17,20 @@ const CREDITS := [
 	"Mario | hk | fkS",
 ]
 
-## Start cell, enemy spawn cells and the fruit waves of every level,
+## Start cell, chef spawn cells and the fruit waves of every level,
 ## copied from levels.py of the original Pygame game. Waves are eaten in this order.
+## "green" lists the faster green chefs, they start showing up on level 5.
 const LEVELS := [
 	{start = Vector2i(2, 1), enemies = [Vector2i(19, 2)], waves = [1]},
 	{start = Vector2i(2, 3), enemies = [Vector2i(3, 13), Vector2i(18, 3)], waves = [1]},
 	{start = Vector2i(2, 2), enemies = [Vector2i(1, 12), Vector2i(17, 1)], waves = [1]},
 	{start = Vector2i(10, 6), enemies = [Vector2i(2, 13), Vector2i(17, 1)], waves = [1, 2]},
-	{start = Vector2i(7, 8), enemies = [Vector2i(2, 13), Vector2i(17, 1), Vector2i(12, 1)], waves = [2, 1]},
-	{start = Vector2i(4, 5), enemies = [Vector2i(2, 13), Vector2i(15, 5)], waves = [1, 2, 3]},
-	{start = Vector2i(7, 7), enemies = [Vector2i(17, 11), Vector2i(1, 5)], waves = [1, 2, 3]},
-	{start = Vector2i(4, 5), enemies = [Vector2i(9, 12), Vector2i(17, 3)], waves = [1, 2]},
-	{start = Vector2i(3, 1), enemies = [Vector2i(3, 13), Vector2i(16, 1), Vector2i(12, 7), Vector2i(16, 13)], waves = [1, 2]},
-	{start = Vector2i(3, 6), enemies = [Vector2i(16, 3), Vector2i(8, 12), Vector2i(10, 2)], waves = [1, 2, 3]},
+	{start = Vector2i(7, 8), enemies = [Vector2i(2, 13), Vector2i(12, 1)], green = [Vector2i(17, 1)], waves = [2, 1]},
+	{start = Vector2i(4, 5), enemies = [Vector2i(2, 13)], green = [Vector2i(15, 5)], waves = [1, 2, 3]},
+	{start = Vector2i(7, 7), enemies = [Vector2i(1, 5)], green = [Vector2i(17, 11)], waves = [1, 2, 3]},
+	{start = Vector2i(4, 5), enemies = [Vector2i(9, 12)], green = [Vector2i(17, 3)], waves = [1, 2]},
+	{start = Vector2i(3, 1), enemies = [Vector2i(3, 13), Vector2i(16, 1), Vector2i(12, 7)], green = [Vector2i(16, 13)], waves = [1, 2]},
+	{start = Vector2i(3, 6), enemies = [Vector2i(8, 12), Vector2i(10, 2)], green = [Vector2i(16, 3)], waves = [1, 2, 3]},
 ]
 
 var level := 1  ## the level being played, starts at 1

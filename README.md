@@ -16,6 +16,7 @@ A gamepad works too: the d-pad walks and the bottom face button (A on Xbox, Cros
 
 - Eat every fruit to clear a wave. Some levels have two or three waves.
 - Chefs wander around. If you get close they spot you and run after you.
+- From level 5 on, a green chef joins in. It spots you from further away, runs faster and smashes ice quicker than the red one.
 - Ice blocks the chefs, but if they can't reach you they'll smash through it.
 - You have 2 minutes. After that, fruit is only worth half the points.
 
