@@ -209,7 +209,8 @@ func _spawn(script: Script, c: Vector2i, props := {}) -> Actor:
 
 
 ## Ends the level once. The win or lose animation plays right away with
-## a big banner on top, then the popup with the buttons follows.
+## a big banner on top, then a popup with just the buttons shows up
+## under the banner.
 func finish(won: bool) -> void:
 	if over:
 		return
@@ -220,11 +221,11 @@ func finish(won: bool) -> void:
 		G.sfx("win")
 	var banner := _banner("You Won!" if won else "You Lost!")
 	await get_tree().create_timer(END_DELAY, false).timeout
-	banner.queue_free()
 	var last := G.level >= G.LEVELS.size()
 	var next := ["levels" if last else "next level", _next_level]
-	popup = G.popup(overlay, "You Won !" if won else "You Lost !",
-		[next if won else ["restart", G.go.bind("game")], ["quit", G.go.bind("menu")]])
+	# The banner already says won or lost, so the popup only has buttons.
+	popup = G.popup(overlay, "", [next if won else ["restart", G.go.bind("game")], ["quit", G.go.bind("menu")]])
+	banner.move_to_front()  # keep it bright above the dimmed game
 	get_tree().paused = true
 
 

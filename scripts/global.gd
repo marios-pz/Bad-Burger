@@ -154,15 +154,22 @@ func draw_tables(canvas: CanvasItem) -> void:
 ## The small window used by the pause, win and lose screens. The game
 ## behind it is dimmed. The first button gets keyboard and gamepad focus.
 ## Returns the layer so the caller can free it.
+## With an empty title it is only a small box of buttons, placed lower so
+## a banner can sit above it.
 func popup(parent: Node, title: String, buttons: Array) -> Control:
 	var layer := ColorRect.new()
 	layer.color = Color(0, 0, 0, 0.45)
 	layer.size = Vector2(W, H)
 	parent.add_child(layer)
-	panel(layer, Rect2(180, 140, 280, 200))
-	label(layer, title, 42, Rect2(180, 158, 280, 40))
+	var top := 214
+	if title:
+		panel(layer, Rect2(180, 140, 280, 200))
+		label(layer, title, 42, Rect2(180, 158, 280, 40))
+	else:
+		top = 270
+		panel(layer, Rect2(220, top - 14, 200, buttons.size() * 52 + 22))
 	for i in buttons.size():
-		var b := button(layer, Rect2(240, 214 + i * 52, 160, 42), buttons[i][0], 31, buttons[i][1])
+		var b := button(layer, Rect2(240, top + i * 52, 160, 42), buttons[i][0], 31, buttons[i][1])
 		if i == 0:
 			b.grab_focus.call_deferred()
 	return layer
