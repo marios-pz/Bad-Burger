@@ -208,7 +208,8 @@ func _spawn(script: Script, c: Vector2i, props := {}) -> Actor:
 	return a
 
 
-## Ends the level once. The win or lose animation plays right away.
+## Ends the level once. The win or lose animation plays right away with
+## a big banner on top, then the popup with the buttons follows.
 func finish(won: bool) -> void:
 	if over:
 		return
@@ -217,12 +218,27 @@ func finish(won: bool) -> void:
 		p.finish(won)
 	if won:
 		G.sfx("win")
+	var banner := _banner("You Won!" if won else "You Lost!")
 	await get_tree().create_timer(END_DELAY, false).timeout
+	banner.queue_free()
 	var last := G.level >= G.LEVELS.size()
 	var next := ["levels" if last else "next level", _next_level]
 	popup = G.popup(overlay, "You Won !" if won else "You Lost !",
 		[next if won else ["restart", G.go.bind("game")], ["quit", G.go.bind("menu")]])
 	get_tree().paused = true
+
+
+## Large outlined text that pops in over the middle of the screen.
+func _banner(text: String) -> Label:
+	var banner := G.label(overlay, text, 84, Rect2(0, 150, G.W, 100))
+	banner.add_theme_color_override("font_color", Color(0.965, 0.906, 0.784))
+	banner.add_theme_color_override("font_outline_color", Color(0.169, 0.102, 0.071))
+	banner.add_theme_constant_override("outline_size", 16)
+	banner.pivot_offset = banner.size / 2.0
+	banner.scale = Vector2(0.4, 0.4)
+	banner.create_tween().tween_property(banner, "scale", Vector2.ONE, 0.35) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	return banner
 
 
 func _toggle_pause() -> void:
