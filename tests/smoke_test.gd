@@ -12,6 +12,13 @@ func check(ok: bool, what: String) -> void:
 		printerr("FAIL: ", what)
 
 
+func press(key: Key, down: bool) -> void:
+	var e := InputEventKey.new()
+	e.physical_keycode = key
+	e.pressed = down
+	Input.parse_input_event(e)
+
+
 func load_level(n: int) -> Game:
 	G.level = n
 	var game: Game = load("res://scenes/game.tscn").instantiate()
@@ -39,6 +46,17 @@ func _ready() -> void:
 	check(game.ice_line(Vector2i(2, 2), Vector2i.DOWN) == 2, "ice line stops at the first block")
 	check(game.is_ice(Vector2i(2, 3)) and not game.is_free(Vector2i(2, 3)), "new ice blocks the cell")
 	check(game.break_line(Vector2i(6, 2), Vector2i.RIGHT) == 8, "kick breaks the whole row of 8")
+	game.free()
+
+	# Pressing D (WASD) walks the burger one cell to the right.
+	game = load_level(1)
+	game.enemies[0].place(Vector2i(17, 13))  # keep the chef out of the way
+	var start: Vector2i = game.player.cell
+	press(KEY_D, true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	press(KEY_D, false)
+	check(game.player.cell == start + Vector2i.RIGHT, "the D key walks right")
 	game.free()
 
 	# A chef standing next to an idle burger catches it.

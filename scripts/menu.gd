@@ -58,7 +58,7 @@ func _ready() -> void:
 	G.image(help_page, "credits_bg", Rect2(0, 0, 640, 464))
 	G.image(help_page, "panel_bg", Rect2(160, 94, 320, 232))
 	G.label(help_page, "moving", 40, Rect2(0, 155, G.W, 45))
-	G.label(help_page, "arrows: move\nspace: make or break ice", 15,
+	G.label(help_page, "arrows or wasd: move\nspace: make or break ice", 15,
 		Rect2(212, 246, 216, 52))
 	showcase = AnimatedSprite2D.new()
 	showcase.sprite_frames = G.FRAMES

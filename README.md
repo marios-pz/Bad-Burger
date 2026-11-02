@@ -8,9 +8,11 @@ Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Grec
 
 | Key | What it does |
 | --- | --- |
-| Arrow keys | Walk |
+| Arrow keys or WASD | Walk |
 | Space | Shoot a line of ice, or kick away the ice in front of you |
 | Escape | Pause |
+
+A gamepad works too: the d-pad walks and the bottom face button (A on Xbox, Cross on PlayStation) casts ice.
 
 - Eat every fruit to clear a wave. Some levels have two or three waves.
 - Chefs wander around. If you get close they spot you and run after you.

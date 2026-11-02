@@ -1,5 +1,5 @@
 extends Actor
-## The burger. Arrow keys walk one cell at a time. Space shoots a line of
+## The burger. Arrow keys or WASD walk one cell at a time. Space shoots a line of
 ## ice in front of it, or kicks away the line of ice it is facing.
 
 const CAST_MS := 500  ## the cast animation, the burger can not walk meanwhile
@@ -27,7 +27,7 @@ func _process(delta: float) -> void:
 	if casting_until:
 		return
 
-	if Input.is_action_just_pressed("ui_accept") and not moving and _can_cast(now):
+	if Input.is_action_just_pressed("cast") and not moving and _can_cast(now):
 		_cast(now)
 		return
 	var held := _held_direction()
@@ -36,15 +36,16 @@ func _process(delta: float) -> void:
 	face("player_walk" if moving or held != Vector2i.ZERO else "player_idle")
 
 
-## Same key priority as the original: left, right, down, up.
+## Same priority as the original: left, right, down, up.
+## Arrow keys, WASD and the gamepad d-pad all work (see Project Settings, Input Map).
 static func _held_direction() -> Vector2i:
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("move_left"):
 		return Vector2i.LEFT
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("move_right"):
 		return Vector2i.RIGHT
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("move_down"):
 		return Vector2i.DOWN
-	if Input.is_action_pressed("ui_up"):
+	if Input.is_action_pressed("move_up"):
 		return Vector2i.UP
 	return Vector2i.ZERO
 
