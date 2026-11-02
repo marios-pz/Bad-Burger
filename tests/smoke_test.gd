@@ -59,6 +59,22 @@ func _ready() -> void:
 	check(game.player.cell == start + Vector2i.RIGHT, "the D key walks right")
 	game.free()
 
+	# Pressing A halfway through a step to the right turns straight back,
+	# even with D still held, because the newest key wins.
+	game = load_level(1)
+	game.enemies[0].place(Vector2i(17, 13))
+	start = game.player.cell
+	press(KEY_D, true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	press(KEY_A, true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	press(KEY_A, false)
+	press(KEY_D, false)
+	check(game.player.cell == start and game.player.dir == Vector2i.LEFT, "turning back mid-step returns to the start cell")
+	game.free()
+
 	# A chef standing next to an idle burger catches it.
 	game = load_level(1)
 	game.enemies[0].place(game.player.cell + Vector2i.RIGHT)

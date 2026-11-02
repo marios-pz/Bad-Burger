@@ -25,10 +25,18 @@ func try_move(d: Vector2i) -> void:
 		moving = true
 
 
-func slide(delta: float) -> void:
+## Moves towards the current cell. When it arrives it returns the time
+## left over in this frame, so the next step can use it without a hitch.
+func slide(delta: float) -> float:
 	var target := Game.cell_center(cell)
-	position = position.move_toward(target, speed * delta)
-	moving = position != target
+	var step := speed * delta
+	var dist := position.distance_to(target)
+	if step >= dist:
+		position = target
+		moving = false
+		return (step - dist) / speed
+	position = position.move_toward(target, step)
+	return 0.0
 
 
 ## Plays name_down, name_up or name_side for the current direction.
