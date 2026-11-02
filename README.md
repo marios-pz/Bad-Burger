@@ -37,7 +37,8 @@ It loads all 10 levels, tries the main rules and prints `PASS`.
 
 The game should feel the same. Under the hood a few things got simpler:
 
-- All the sprites (about 140 PNG files) are packed into one sheet, `assets/atlas.png`. The original images live in `art/sprites/`. If you change them, run `python3 tools/build_atlas.py` to rebuild the sheet.
+- All the game sprites (about 130 PNG files) are packed into one sheet, `assets/atlas.png`. The original images live in `art/sprites/`. If you change them, run `python3 tools/build_atlas.py` to rebuild the sheet.
+- The menus, popups and HUD use a Godot theme, `assets/ui_theme.tres`, instead of drawn images. Open it in the Godot editor to change colors, borders or fonts everywhere at once. Menus also work with a keyboard or a gamepad now.
 - The chefs find their way with Godot's built in pathfinding instead of our own.
 - Pausing really freezes everything now, ice timers included.
 - The music and sound buttons in the menu actually work, and the game remembers your choice.
@@ -49,10 +50,10 @@ The game should feel the same. Under the hood a few things got simpler:
 | --- | --- |
 | `scenes/` | The three screens: menu, level select and the game |
 | `scripts/` | All the game code. `global.gd` is shared by every screen |
-| `assets/` | The sprite sheet, font, sounds and the level maps |
+| `assets/` | The sprite sheet, UI theme, font, sounds and the level maps |
 | `tests/` | The smoke test |
 | `tools/` | The script that builds the sprite sheet |
-| `art/sprites/` | The original separate sprite images, used to build the sheet |
+| `art/sprites/` | The separate game sprite images, used to build the sheet |
 
 The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, `1` is ice, `2` is a furnace and `3` is a counter. In the `fruits_*.txt` files, `1` to `4` are banana, cherry, lemon and grape.
 

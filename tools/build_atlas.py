@@ -8,6 +8,9 @@ It writes two files:
                       single image is an entry in it, so the game loads
                       one texture and one resource for all its art.
 
+Only game art lives here. Buttons, boxes and other UI come from the
+Godot theme in assets/ui_theme.tres.
+
 Single images are stored as one frame animations. In GDScript you get
 them with G.tex("name").
 """
@@ -38,9 +41,8 @@ ANIMATIONS = {
     "enemy_up": ("enemy1_up", 14.29, True, None),
     "enemy_side": ("enemy1_side", 14.29, True, None),  # faces left
     "ice_break": ("iceblock", 12, False, None),
-    "clock": ("clock", 10, True, 8),
+    "clock": ("clock", 10, True, None),
     "menu_run": ("walk_right", 15, True, None),
-    "level_hover": ("hover_button_animation", 10, True, None),
 }
 
 STATICS = {
@@ -53,18 +55,6 @@ STATICS = {
     "fruit_3": "fruits/lemon.png",
     "fruit_4": "fruits/grape.png",
     "alert": "exlamation_point.png",
-    "button": "button.png",
-    "button_hover": "button_hover.png",
-    "clock_ui": "clock/clock_ui.png",
-    "credits_bg": "credits-background.png",
-    "panel_bg": "credits-background-no-burger.png",
-    "fruit_bar": "frut_background.png",
-    "lock": "level_not_available.png",
-    "music_on": "music_on.png",
-    "music_off": "music_off.png",
-    "sfx_on": "sfx_on.png",
-    "sfx_off": "sfx_off.png",
-    "arrow": "arrows/arrow.png",
 }
 
 
@@ -77,8 +67,6 @@ def frames_of(folder: str, limit):
     if folder == "iceblock":
         # iceblock.png is the untouched block, the break starts at iceblock1
         files = [f for f in files if f.name != "iceblock.png"]
-    if folder == "clock":
-        files = [f for f in files if f.name != "clock_ui.png"]
     return files[:limit] if limit else files
 
 
