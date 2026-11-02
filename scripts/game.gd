@@ -13,6 +13,7 @@ const ICE_ALPHA := 180.0 / 255.0
 const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
 const BREAK_ALPHA := 128.0 / 255.0
 const PlayerScript := preload("res://scripts/player.gd")
+const EnemyScript := preload("res://scripts/enemy.gd")
 
 var grid := []  ## grid[y][x] is 1 when the cell is blocked
 var blocks := {}  ## Vector2i -> AnimatedSprite2D (counter, furnace or ice)
@@ -25,6 +26,7 @@ var over := false  ## true once the level is won or lost
 
 var player: Actor
 var enemies: Array[Actor] = []
+var astar := AStarGrid2D.new()
 
 var fruit_layer := Node2D.new()
 var world := Node2D.new()  ## everything that stands on the floor, sorted by height
@@ -45,6 +47,12 @@ func _ready() -> void:
 	_build_hud()
 	_load_wave()
 	player = _spawn(PlayerScript, G.LEVELS[G.level - 1].start)
+	for c in G.LEVELS[G.level - 1].enemies:
+		enemies.append(_spawn(EnemyScript, c))
+	astar.region = Rect2i(0, 0, COLS, ROWS)
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	astar.update()
 
 
 func _draw() -> void:
@@ -54,6 +62,8 @@ func _draw() -> void:
 func _process(delta: float) -> void:
 	time_left = maxf(time_left - delta, 0.0)
 	_eat_fruit()
+	if not over and _enemy_at(player.cell):
+		finish(false)
 	_update_hud()
 
 
@@ -85,9 +95,14 @@ func in_grid(c: Vector2i) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < COLS and c.y < ROWS
 
 
-## Walkable means inside the outer ring of the kitchen and not blocked.
+## Inside the outer ring of the kitchen, the ring itself is never walkable.
+func _inside(c: Vector2i) -> bool:
+	return c.x >= 1 and c.y >= 1 and c.x <= COLS - 2 and c.y <= ROWS - 2
+
+
+## Walkable means inside the ring and not blocked.
 func is_free(c: Vector2i) -> bool:
-	return c.x >= 1 and c.y >= 1 and c.x <= COLS - 2 and c.y <= ROWS - 2 and grid[c.y][c.x] == 0
+	return _inside(c) and grid[c.y][c.x] == 0
 
 
 func set_cell(c: Vector2i, value: int) -> void:
@@ -127,6 +142,18 @@ func add_block(c: Vector2i, kind: String, show_after := 0.0) -> AnimatedSprite2D
 		b.hide()
 		b.create_tween().tween_callback(b.show).set_delay(show_after)
 	return b
+
+
+## Shortest walk from a to b, or an empty list. With through_ice the
+## chefs plan as if ice was not there. This replaces pathfinder.py.
+func find_path(a: Vector2i, b: Vector2i, through_ice: bool) -> Array[Vector2i]:
+	for y in ROWS:
+		for x in COLS:
+			var c := Vector2i(x, y)
+			astar.set_point_solid(c, not (is_free(c) or (through_ice and is_ice(c) and _inside(c))))
+	astar.set_point_solid(a, false)  # level 1 spawns its chef inside a furnace
+	astar.set_point_solid(b, false)
+	return astar.get_id_path(a, b)
 
 
 # --- Ice --------------------------------------------------------------------
