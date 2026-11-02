@@ -91,5 +91,36 @@ func _ready() -> void:
 	check(game.over and game.player.done, "a chef next to the burger ends the level")
 	game.free()
 
+	# Co-op: player 2 starts on a free cell next to player 1 on every level.
+	G.players = 2
+	for n in range(1, G.LEVELS.size() + 1):
+		game = load_level(n)
+		var p1: Actor = game.players[0]
+		var p2: Actor = game.players[1]
+		var sealed := not Game.DIRS.any(func(d): return game.is_free(p1.cell + d))
+		check(game.is_free(p2.cell) and not game._enemy_at(p2.cell) and (p2.cell != p1.cell or sealed),
+			"level %d: player 2 starts on a free cell next to player 1" % n)
+		game.free()
+
+	# Co-op rule: a caught burger is out until the next wave, the level is
+	# lost only when both are caught. Level 4 has two fruit waves.
+	game = load_level(4)
+	var p1: Actor = game.players[0]
+	var p2: Actor = game.players[1]
+	game.enemies[0].place(p2.cell)
+	await get_tree().process_frame
+	check(p2.out and not game.over, "co-op: one caught burger does not end the level")
+	for f in game.fruits.values():
+		f.free()
+	game.fruits.clear()
+	await get_tree().process_frame
+	check(game.wave == 1 and not p2.out, "co-op: the next fruit wave brings the caught burger back")
+	game.enemies[0].place(p1.cell)
+	game.enemies[1].place(p2.cell)
+	await get_tree().process_frame
+	check(game.over and p1.out and p2.out, "co-op: catching both burgers ends the level")
+	game.free()
+	G.players = 1
+
 	print("PASS" if failures == 0 else "%d check(s) failed" % failures)
 	get_tree().quit(1 if failures else 0)

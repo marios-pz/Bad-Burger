@@ -1,7 +1,11 @@
 class_name Game
 extends Node2D
-## One level: the kitchen floor, counters, furnaces, ice, fruit, the burger
+## One level: the kitchen floor, counters, furnaces, ice, fruit, the burgers
 ## and the chefs, with the score and timer on top.
+##
+## In local co-op (G.players == 2) a second burger joins. A caught burger
+## is out until the next fruit wave, and the level is lost only when both
+## burgers are caught.
 
 const TILE := 32
 const COLS := 20
@@ -19,6 +23,8 @@ const FRUIT_POINTS := 25.0
 const ICE_ALPHA := 180.0 / 255.0
 const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
 const BREAK_ALPHA := 128.0 / 255.0
+const P2_HUE := 0.06  ## how far player 2's colors are shifted, 0 to 1
+const DIRS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]
 const PlayerScript := preload("res://scripts/player.gd")
 const EnemyScript := preload("res://scripts/enemy.gd")
 
@@ -31,7 +37,9 @@ var score := 0.0
 var time_left := TIME_LIMIT
 var over := false  ## true once the level is won or lost
 
-var player: Actor
+var player: Actor  ## player 1, also the only burger in solo play
+var players: Array[Actor] = []
+var cam := Camera2D.new()
 var enemies: Array[Actor] = []
 var astar := AStarGrid2D.new()
 
@@ -61,13 +69,23 @@ func _ready() -> void:
 	_load_map()
 	_build_hud()
 	_load_wave()
-	player = _spawn(PlayerScript, G.LEVELS[G.level - 1].start)
-	_add_camera()
 	var level: Dictionary = G.LEVELS[G.level - 1]
 	for c in level.enemies:
 		enemies.append(_spawn(EnemyScript, c))
 	for c in level.get("green", []):
 		enemies.append(_spawn(EnemyScript, c, {kind = "green"}))
+	var coop := G.players == 2
+	player = _spawn(PlayerScript, level.start, {controls = "p1_" if coop else ""})
+	players.append(player)
+	if coop:
+		var p2 := _spawn(PlayerScript, free_cell_near(level.start), {controls = "p2_"})
+		p2.material = ShaderMaterial.new()
+		p2.material.shader = preload("res://assets/hue_shift.gdshader")
+		p2.material.set_shader_parameter("hue_shift", P2_HUE)
+		players.append(p2)
+		_add_tag(player, "1")
+		_add_tag(p2, "2")
+	_add_camera()
 	astar.region = Rect2i(0, 0, COLS, ROWS)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
@@ -91,15 +109,63 @@ func _process(delta: float) -> void:
 		return
 	time_left = maxf(time_left - delta, 0.0)
 	_eat_fruit()
-	if not over and _enemy_at(player.cell):
-		finish(false)
+	_catch_burgers()
+	_move_camera(delta)
 	_update_hud()
 
 
-## A camera that follows the burger, zoomed in so the kitchen feels
-## closer, and stops at the kitchen walls so nothing outside shows.
+## Burgers still in the game, the ones not caught yet.
+func alive_players() -> Array[Actor]:
+	return players.filter(func(p: Actor): return not p.out)
+
+
+func _catch_burgers() -> void:
+	if over:
+		return
+	for p in alive_players():
+		if not _enemy_at(p.cell):
+			continue
+		if players.size() == 1:
+			finish(false)
+			return
+		p.knock_out()
+		if alive_players().is_empty():
+			finish(false)
+			return
+
+
+## The free cell closest to c that no chef stands on. Used to place
+## player 2 next to player 1, and to bring caught burgers back. Some
+## levels start the burger sealed in ice, then this returns c itself
+## and both burgers share the cell until they break out.
+func free_cell_near(c: Vector2i) -> Vector2i:
+	var seen := {c: true}
+	var queue: Array[Vector2i] = [c]
+	while not queue.is_empty():
+		var current: Vector2i = queue.pop_front()
+		for d in DIRS:
+			var next := current + d
+			if seen.has(next) or not is_free(next):
+				continue
+			if not _enemy_at(next):
+				return next
+			seen[next] = true
+			queue.append(next)
+	return c
+
+
+## A small "1" or "2" floating over a burger in co-op.
+func _add_tag(p: Actor, text: String) -> void:
+	var tag := G.label(p, text, 18, Rect2(-20, -36, 40, 16))
+	tag.add_theme_color_override("font_color", Color(0.965, 0.906, 0.784))
+	tag.add_theme_color_override("font_outline_color", Color(0.169, 0.102, 0.071))
+	tag.add_theme_constant_override("outline_size", 6)
+
+
+## The camera stops at the kitchen walls so nothing outside shows.
+## Solo: it follows the burger, zoomed in. Co-op: it sits between the
+## burgers and zooms out as far as needed to keep both on screen.
 func _add_camera() -> void:
-	var cam := Camera2D.new()
 	cam.zoom = Vector2(ZOOM, ZOOM)
 	cam.limit_left = 0
 	cam.limit_top = 0
@@ -107,8 +173,24 @@ func _add_camera() -> void:
 	cam.limit_bottom = ROWS * TILE
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 8.0
-	player.add_child(cam)
+	world.add_child(cam)
+	_move_camera(0.0)
 	cam.reset_smoothing()
+
+
+func _move_camera(delta: float) -> void:
+	var group := alive_players()
+	if group.is_empty():
+		group = players
+	var box := Rect2(group[0].position, Vector2.ZERO)
+	for p in group:
+		box = box.expand(p.position)
+	cam.position = box.get_center()
+	# Keep about 3 cells of room around the burgers on every side.
+	var room := box.size + Vector2(6, 6) * TILE
+	var fit := minf(G.W / room.x, G.H / room.y)
+	var target := clampf(fit, 1.0, ZOOM)
+	cam.zoom = Vector2.ONE * (target if delta == 0.0 else lerpf(cam.zoom.x, target, 1.0 - exp(-4.0 * delta)))
 
 
 ## Creates the burger or a chef on cell c. props are set before it
@@ -128,7 +210,8 @@ func finish(won: bool) -> void:
 	if over:
 		return
 	over = true
-	player.finish(won)
+	for p in alive_players():
+		p.finish(won)
 	if won:
 		G.sfx("win")
 	await get_tree().create_timer(END_DELAY, false).timeout
@@ -244,11 +327,16 @@ func _enemy_at(c: Vector2i) -> bool:
 	return enemies.any(func(e: Actor): return e.cell == c)
 
 
-## Freezes floor cells from c onwards until something is in the way.
+func _burger_at(c: Vector2i) -> bool:
+	return alive_players().any(func(p: Actor): return p.cell == c)
+
+
+## Freezes floor cells from c onwards until something is in the way,
+## a block, a chef or the other burger.
 ## Each block shows up 0.1 seconds after the one before it.
 func ice_line(c: Vector2i, d: Vector2i) -> int:
 	var count := 0
-	while in_grid(c) and grid[c.y][c.x] == 0 and not _enemy_at(c):
+	while in_grid(c) and grid[c.y][c.x] == 0 and not _enemy_at(c) and not _burger_at(c):
 		add_block(c, "ice", 0.1 + count * 0.1)
 		count += 1
 		c += d
@@ -306,23 +394,33 @@ func _load_wave() -> void:
 	_update_wave_box()
 
 
-## Fruit drawn a bit smaller than a tile, the grape is squeezed to 24x24.
-## Fruit is eaten as soon as the burger starts walking into its cell.
-## After the clock runs out every fruit is worth half.
+## Fruit is eaten as soon as a burger starts walking into its cell.
+## After the clock runs out every fruit is worth half. A new wave brings
+## caught burgers back next to a teammate.
 func _eat_fruit() -> void:
-	if fruits.has(player.cell):
-		fruits[player.cell].queue_free()
-		fruits.erase(player.cell)
-		score += FRUIT_POINTS * (1.0 if time_left > 0 else 0.5)
-		G.sfx("fruit_pickup")
+	for p in alive_players():
+		if fruits.has(p.cell):
+			fruits[p.cell].queue_free()
+			fruits.erase(p.cell)
+			score += FRUIT_POINTS * (1.0 if time_left > 0 else 0.5)
+			G.sfx("fruit_pickup")
 	if fruits.is_empty() and not over:
 		if wave < waves.size() - 1:
 			wave += 1
 			_load_wave()
+			_revive_burgers()
 		else:
 			finish(true)
 
 
+func _revive_burgers() -> void:
+	var standing := alive_players()
+	for p in players:
+		if p.out and not standing.is_empty():
+			p.revive(free_cell_near(standing[0].cell))
+
+
+## Fruit drawn a bit smaller than a tile, the grape is squeezed to 24x24.
 static func _fruit_sprite(kind: int) -> Sprite2D:
 	var f := Sprite2D.new()
 	f.texture = G.tex("fruit_%d" % kind)

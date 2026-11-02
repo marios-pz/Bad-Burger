@@ -40,7 +40,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	var now := Time.get_ticks_msec()
-	var sees := sees_player()
+	var prey := spotted()
+	var sees := prey != null
 	if sees and not saw_player:
 		G.sfx("detect", 0.2)
 	saw_player = sees
@@ -51,32 +52,44 @@ func _process(delta: float) -> void:
 	if moving:
 		slide(delta)
 	else:
-		_think(sees, now)
+		_think(prey, now)
 	if moving:
 		face("enemy")
 	else:
 		pause()
 
 
+## The closest burger still in the game within sight, or null. Caught
+## burgers in co-op are ignored.
+func spotted() -> Actor:
+	var best: Actor = null
+	var best_gap := sight + 1
+	for p in game.alive_players():
+		var gap: Vector2i = (p.cell - cell).abs()
+		if maxi(gap.x, gap.y) < best_gap:
+			best = p
+			best_gap = maxi(gap.x, gap.y)
+	return best
+
+
 func sees_player() -> bool:
-	var gap: Vector2i = (game.player.cell - cell).abs()
-	return maxi(gap.x, gap.y) <= sight
+	return spotted() != null
 
 
-func _think(sees: bool, now: int) -> void:
-	if not sees:
+func _think(prey: Actor, now: int) -> void:
+	if prey == null:
 		speed = wander_speed
 		# Keep walking straight, pick a random way when blocked.
 		try_move(dir if game.is_free(cell + dir) else DIRECTIONS.pick_random())
 		return
 
 	speed = chase_speed
-	var path: Array[Vector2i] = game.find_path(cell, game.player.cell, false)
+	var path: Array[Vector2i] = game.find_path(cell, prey.cell, false)
 	if path.size() >= 2:
 		try_move(path[1] - cell)
 		return
 	# No open way: plan a route through ice and smash the first block.
-	path = game.find_path(cell, game.player.cell, true)
+	path = game.find_path(cell, prey.cell, true)
 	if path.size() < 2:
 		return
 	var step := path[1] - cell

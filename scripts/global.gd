@@ -34,6 +34,7 @@ const LEVELS := [
 ]
 
 var level := 1  ## the level being played, starts at 1
+var players := 1  ## 1 for solo, 2 for local co-op
 var menu_opened := false  ## skip the "click to eat" screen after the first visit
 var music_on := true
 var sfx_on := true

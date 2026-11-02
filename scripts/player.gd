@@ -18,6 +18,7 @@ var cooldown_until := 0
 var cooldown_dir := Vector2i.ZERO
 var controls := ""  ## input action prefix: "", "p1_" or "p2_", set before spawning
 var done := false  ## the level is over, only the win or lose animation plays
+var out := false  ## caught by a chef in co-op, waits for the next fruit wave
 var held: Array[Vector2i] = []  ## directions being held, the newest one last
 var queued_dir := Vector2i.ZERO  ## last direction pressed, kept for a moment
 var queued_at := -BUFFER_MS
@@ -118,3 +119,21 @@ func finish(won: bool) -> void:
 	if not won:
 		G.sfx("death", 0.3)
 
+
+## Caught in co-op: plays the dying animation and stays on the floor,
+## faded, until the next fruit wave brings it back.
+func knock_out() -> void:
+	finish(false)
+	out = true
+	modulate.a = 0.5
+
+
+## Back in the game on cell c, ready to walk.
+func revive(c: Vector2i) -> void:
+	done = false
+	out = false
+	modulate.a = 1.0
+	casting_until = 0
+	held.clear()
+	place(c)
+	face("player_idle")
