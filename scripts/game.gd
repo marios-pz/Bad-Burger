@@ -11,6 +11,8 @@ const TIME_LIMIT := 120.0
 const FRUIT_POINTS := 25.0
 const ICE_ALPHA := 180.0 / 255.0
 const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
+const BREAK_ALPHA := 128.0 / 255.0
+const PlayerScript := preload("res://scripts/player.gd")
 
 var grid := []  ## grid[y][x] is 1 when the cell is blocked
 var blocks := {}  ## Vector2i -> AnimatedSprite2D (counter, furnace or ice)
@@ -19,6 +21,10 @@ var waves: Array = []  ## fruit kind (1 to 4) of every wave
 var wave := 0
 var score := 0.0
 var time_left := TIME_LIMIT
+var over := false  ## true once the level is won or lost
+
+var player: Actor
+var enemies: Array[Actor] = []
 
 var fruit_layer := Node2D.new()
 var world := Node2D.new()  ## everything that stands on the floor, sorted by height
@@ -38,6 +44,7 @@ func _ready() -> void:
 	_load_map()
 	_build_hud()
 	_load_wave()
+	player = _spawn(PlayerScript, G.LEVELS[G.level - 1].start)
 
 
 func _draw() -> void:
@@ -46,7 +53,26 @@ func _draw() -> void:
 
 func _process(delta: float) -> void:
 	time_left = maxf(time_left - delta, 0.0)
+	_eat_fruit()
 	_update_hud()
+
+
+func _spawn(script: Script, c: Vector2i) -> Actor:
+	var a: Actor = script.new()
+	a.game = self
+	a.place(c)
+	world.add_child(a)
+	return a
+
+
+## Ends the level once. The win or lose animation plays right away.
+func finish(won: bool) -> void:
+	if over:
+		return
+	over = true
+	player.finish(won)
+	if won:
+		G.sfx("win")
 
 
 # --- Grid -------------------------------------------------------------------
@@ -103,6 +129,57 @@ func add_block(c: Vector2i, kind: String, show_after := 0.0) -> AnimatedSprite2D
 	return b
 
 
+# --- Ice --------------------------------------------------------------------
+
+func _enemy_at(c: Vector2i) -> bool:
+	return enemies.any(func(e: Actor): return e.cell == c)
+
+
+## Freezes floor cells from c onwards until something is in the way.
+## Each block shows up 0.1 seconds after the one before it.
+func ice_line(c: Vector2i, d: Vector2i) -> int:
+	var count := 0
+	while in_grid(c) and grid[c.y][c.x] == 0 and not _enemy_at(c):
+		add_block(c, "ice", 0.1 + count * 0.1)
+		count += 1
+		c += d
+	return count
+
+
+## Breaks every ice block in a row from c onwards, one after another.
+func break_line(c: Vector2i, d: Vector2i) -> int:
+	var count := 0
+	while is_ice(c):
+		break_ice(c, count * 0.1)
+		count += 1
+		c += d
+	return count
+
+
+## Plays the shatter animation after delay and removes the block 0.5
+## seconds later. Chefs smash ice with free_now so they can walk in at once.
+func break_ice(c: Vector2i, delay: float, free_now := false) -> void:
+	if not is_ice(c) or blocks[c].get_meta("breaking", false):
+		return
+	var b: AnimatedSprite2D = blocks[c]
+	b.set_meta("breaking", true)
+	if free_now:
+		set_cell(c, 0)
+	var t := b.create_tween()
+	t.tween_interval(delay)
+	t.tween_callback(func():
+		b.show()
+		b.modulate.a = BREAK_ALPHA
+		b.play("ice_break"))
+	t.tween_interval(0.5)
+	t.tween_callback(func():
+		if blocks.get(c) == b:  # a new block may already sit here
+			blocks.erase(c)
+			set_cell(c, 0)
+		b.queue_free()
+		G.sfx("ice_smash", 0.2))
+
+
 # --- Fruit ------------------------------------------------------------------
 
 func _load_wave() -> void:
@@ -121,6 +198,22 @@ func _load_wave() -> void:
 
 
 ## Fruit drawn a bit smaller than a tile, the grape is squeezed to 24x24.
+## Fruit is eaten as soon as the burger starts walking into its cell.
+## After the clock runs out every fruit is worth half.
+func _eat_fruit() -> void:
+	if fruits.has(player.cell):
+		fruits[player.cell].queue_free()
+		fruits.erase(player.cell)
+		score += FRUIT_POINTS * (1.0 if time_left > 0 else 0.5)
+		G.sfx("fruit_pickup")
+	if fruits.is_empty() and not over:
+		if wave < waves.size() - 1:
+			wave += 1
+			_load_wave()
+		else:
+			finish(true)
+
+
 static func _fruit_sprite(kind: int) -> Sprite2D:
 	var f := Sprite2D.new()
 	f.texture = G.tex("fruit_%d" % kind)
