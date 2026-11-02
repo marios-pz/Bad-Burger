@@ -73,7 +73,8 @@ func _ready() -> void:
 	G.label(help_page, "make or break ice", 22, Rect2(284, 228, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
 	_key(Rect2(150, 272, 120, 32), "esc")
 	G.label(help_page, "pause", 22, Rect2(284, 272, 230, 32), HORIZONTAL_ALIGNMENT_LEFT)
-	G.label(help_page, "eat all the fruit and dodge the chefs!", 22, Rect2(130, 316, 380, 40))
+	G.label(help_page, "eat all the fruit and dodge the chefs!", 22, Rect2(130, 306, 380, 28))
+	G.label(help_page, "2 players: player 2 uses the arrows and enter", 22, Rect2(130, 334, 380, 28))
 	G.button(help_page, Rect2(250, 376, 140, 40), "back", 34, _show.bind("main"))
 
 	_show("main" if G.menu_opened else "title")

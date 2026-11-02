@@ -1,5 +1,6 @@
 extends Control
-## Level select: one button for every level in G.LEVELS, five per row.
+## Level select: one button for every level in G.LEVELS, five per row,
+## and a switch between solo and local co-op.
 
 const PER_ROW := 5
 const SIZE := Vector2(64, 56)
@@ -20,7 +21,14 @@ func _ready() -> void:
 		var b := G.button(self, Rect2(origin + spot * (SIZE + Vector2(GAP, GAP)), SIZE),
 			str(i + 1), 42, _play.bind(i + 1))
 		buttons.append(b)
-	G.label(self, "watch out, green chefs from level 5 on!", 25, Rect2(96, 290, 448, 30))
+	G.label(self, "watch out, green chefs from level 5 on!", 25, Rect2(96, 284, 448, 30))
+
+	var mode := G.button(self, Rect2(220, 330, 200, 42), "", 34)
+	var refresh := func(): mode.text = "1 player" if G.players == 1 else "2 players"
+	refresh.call()
+	mode.pressed.connect(func():
+		G.players = 3 - G.players  # flips between 1 and 2
+		refresh.call())
 
 	G.button(self, Rect2(250, 386, 140, 40), "back", 34, G.go.bind("menu"))
 	buttons[0].grab_focus.call_deferred()  # so keyboard and gamepad can pick a level

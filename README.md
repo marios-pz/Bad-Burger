@@ -59,6 +59,12 @@ A gamepad works too: the d-pad walks and the bottom face button (A on Xbox, Cros
 - Ice blocks the chefs, but if they can't reach you they'll smash through it.
 - You have 2 minutes. After that, fruit is only worth half the points.
 
+### Two players
+
+Pick "2 players" on the level select to play together on one keyboard. Player 1 uses WASD and space, player 2 the arrow keys and enter. Two gamepads work too.
+
+If a chef catches one of you, that burger is out until the next fruit wave starts, then it comes back next to its teammate. You lose only when both burgers get caught.
+
 ## Running the Godot version
 
 1. Install [Godot 4.7](https://godotengine.org/download).
