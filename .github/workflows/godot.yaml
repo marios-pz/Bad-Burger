@@ -1,8 +1,12 @@
 name: "Godot Build"
 
-# Every push runs the smoke test.
-# Run it by hand from the Actions tab to also get the Web, Windows and
-# Linux builds, ready to upload to itch.io.
+# test:    every push and pull request runs the smoke test
+# web:     every push to main builds the web version for itch.io and
+#          uploads it as "bad-burger-web" (download it from the run page).
+#          With a BUTLER_API_KEY secret and an ITCH_GAME variable it is
+#          also pushed straight to itch.io, see the README.
+# desktop: run the workflow by hand from the Actions tab to also get the
+#          Windows and Linux builds
 
 on:
   push:
@@ -31,20 +35,81 @@ jobs:
       - name: Smoke test
         run: godot --headless --path . res://tests/smoke_test.tscn
 
-  export:
+  web:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-24.04
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      ITCH_GAME: ${{ vars.ITCH_GAME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        run: |
+          curl -sSLo godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+
+      - name: Cache the export templates
+        id: templates
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+          key: godot-templates-${{ env.GODOT_VERSION }}
+
+      - name: Download the export templates
+        if: steps.templates.outputs.cache-hit != 'true'
+        run: |
+          curl -sSLo templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates
+          mv templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Export the web build
+        run: |
+          godot --headless --path . --import
+          mkdir -p build/web
+          godot --headless --path . --export-release "Web" build/web/index.html
+          test -f build/web/index.html
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bad-burger-web
+          path: build/web
+
+      - name: Push to itch.io
+        if: env.BUTLER_API_KEY != '' && env.ITCH_GAME != ''
+        run: |
+          curl -sSLo butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler
+          chmod +x butler/butler
+          ./butler/butler push build/web "${ITCH_GAME}:html5" --userversion "${GITHUB_SHA::7}"
+
+  desktop:
     if: github.event_name == 'workflow_dispatch'
     needs: test
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Godot and the export templates
+      - name: Install Godot
         run: |
-          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
-          curl -sSLo godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -sSLo godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
           unzip -q godot.zip
           sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
-          curl -sSLo templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+
+      - name: Cache the export templates
+        id: templates
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+          key: godot-templates-${{ env.GODOT_VERSION }}
+
+      - name: Download the export templates
+        if: steps.templates.outputs.cache-hit != 'true'
+        run: |
+          curl -sSLo templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
           unzip -q templates.tpz
           mkdir -p ~/.local/share/godot/export_templates
           mv templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
@@ -52,15 +117,9 @@ jobs:
       - name: Export
         run: |
           godot --headless --path . --import
-          mkdir -p build/web build/windows build/linux
-          godot --headless --path . --export-release "Web" build/web/index.html
+          mkdir -p build/windows build/linux
           godot --headless --path . --export-release "Windows Desktop" build/windows/BadBurger.exe
           godot --headless --path . --export-release "Linux" build/linux/BadBurger.x86_64
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: bad-burger-web
-          path: build/web
 
       - uses: actions/upload-artifact@v4
         with:

@@ -103,7 +103,20 @@ The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, 
 
 ## Building for itch.io
 
-`export_presets.cfg` has Web, Windows and Linux presets. You can export from the Godot editor (Project, Export), or run the "Godot Build" workflow by hand from the GitHub Actions tab and download the builds it makes.
+Every push to `main` builds the web version on GitHub. Open the "Godot Build" run in the Actions tab and download `bad-burger-web`. It's a zip with `index.html` inside, ready to upload to itch.io as an HTML game. For Windows and Linux builds, run the workflow by hand from the Actions tab.
+
+You can also export yourself from the Godot editor (Project, Export). `export_presets.cfg` has Web, Windows and Linux presets.
+
+### Uploading to itch.io automatically
+
+The workflow can push the web build straight to your itch.io page with [butler](https://itch.io/docs/butler/). It skips this step until you set it up:
+
+1. Get an API key from [itch.io API keys](https://itch.io/user/settings/api-keys).
+2. On GitHub, go to Settings, Secrets and variables, Actions.
+3. Add a secret called `BUTLER_API_KEY` with the key.
+4. Add a variable called `ITCH_GAME` with your page, like `your-name/bad-burger`.
+
+The first time it uploads, open the game's edit page on itch.io and tick "This file will be played in the browser" for the `html5` file. After that every push updates the page by itself.
 
 ## Credits
 
