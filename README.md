@@ -1,5 +1,8 @@
 # Bad Burger
 
+<img width="431" height="294" alt="image" src="https://github.com/user-attachments/assets/fe86d260-b236-4c5d-9bf3-9193aa1f158a" />
+
+
 You are a burger. The chefs want to cook you. Eat all the fruit before they catch you.
 
 Bad Burger started as our entry for the Pygame Summer Team Jam, made by the Greco-France Alliance. Years later I ported it to Godot 4, mostly for the fun of it and so I can upload it to my itch.io page again. If you want the original Pygame code, it's still in the git history, just before the commit that removed it.
