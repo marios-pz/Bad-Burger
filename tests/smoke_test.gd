@@ -19,6 +19,17 @@ func press(key: Key, down: bool) -> void:
 	Input.parse_input_event(e)
 
 
+## How many chef markers a level scene has.
+func chef_markers(n: int) -> int:
+	var scene: Node = load(G.level_path(n)).instantiate()
+	var count := 0
+	for spawn in scene.get_node("Spawns").get_children():
+		if spawn is LevelSpawn and spawn.what != LevelSpawn.What.BURGER:
+			count += 1
+	scene.free()
+	return count
+
+
 func load_level(n: int) -> Game:
 	G.level = n
 	var game: Game = load("res://scenes/game.tscn").instantiate()
@@ -29,13 +40,13 @@ func load_level(n: int) -> Game:
 func _ready() -> void:
 	G.sfx_on = false
 	G.music_on = false
+	check(G.level_count >= 10, "all level scenes are found")
 
-	for n in range(1, G.LEVELS.size() + 1):
+	for n in range(1, G.level_count + 1):
 		var game := load_level(n)
 		check(game.is_free(game.player.cell), "level %d: burger starts on a free cell" % n)
 		check(not game.fruits.is_empty(), "level %d: has fruit" % n)
-		var expected: int = G.LEVELS[n - 1].enemies.size() + G.LEVELS[n - 1].get("green", []).size()
-		check(game.enemies.size() == expected, "level %d: all chefs spawned" % n)
+		check(game.enemies.size() == chef_markers(n), "level %d: all chefs spawned" % n)
 		var greens := game.enemies.filter(func(e): return e.kind == "green").size()
 		check((greens > 0) == (n >= 5), "level %d: green chefs only from level 5 on" % n)
 		for e in game.enemies:
@@ -93,7 +104,7 @@ func _ready() -> void:
 
 	# Co-op: player 2 starts on a free cell next to player 1 on every level.
 	G.players = 2
-	for n in range(1, G.LEVELS.size() + 1):
+	for n in range(1, G.level_count + 1):
 		game = load_level(n)
 		var p1: Actor = game.players[0]
 		var p2: Actor = game.players[1]

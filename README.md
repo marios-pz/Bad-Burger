@@ -99,13 +99,24 @@ The game should feel the same. Under the hood a few things got simpler:
 | --- | --- |
 | `scenes/` | The three screens: menu, level select and the game |
 | `scripts/` | All the game code. `global.gd` is shared by every screen |
-| `assets/` | The sprite sheet, UI theme, font, sounds and the level maps |
+| `levels/` | The 10 levels, one Godot scene each |
+| `assets/` | The sprite sheet, level tiles, UI theme, font and sounds |
 | `tests/` | The smoke test |
 | `tools/` | The script that builds the sprite sheet |
 | `docs/screenshots/` | The pictures used in this README |
 | `art/sprites/` | The separate game sprite images, used to build the sheet |
 
-The level maps are plain text, one number per cell. In `map.txt`, `0` is floor, `1` is ice, `2` is a furnace and `3` is a counter. In the `fruits_*.txt` files, `1` to `4` are banana, cherry, lemon and grape.
+## Making levels
+
+Every level is a scene in `levels/`, like `levels/level_03.tscn`. Open one in the Godot editor:
+
+- **Map** is where you paint furnaces, counters and the ice the level starts with.
+- **Wave1**, **Wave2** and so on hold the fruit. Each layer is one wave, eaten in the order the layers are listed. Hide the other waves while you paint one.
+- **Spawns** has a marker for the burger and one per chef. Drag them onto a cell, and set a chef to red or green in the Inspector.
+
+The kitchen is 20 by 15 cells, and the outer ring is the wall, so keep furnaces or counters there.
+
+To add a level, duplicate the last one and save it with the next number, like `level_11.tscn`. The game finds it by itself, it shows up in the level select and the smoke test checks it.
 
 ## Building for itch.io
 

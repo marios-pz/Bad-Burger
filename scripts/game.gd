@@ -22,7 +22,6 @@ const END_DELAY := 2.0  ## seconds the win or lose animation plays before the po
 const FRUIT_POINTS := 25.0
 const WAVE_SLOT := 64  ## width of one fruit wave in the bottom HUD box
 const ICE_ALPHA := 180.0 / 255.0
-const BLOCK_NAMES := {1: "ice", 2: "furnace", 3: "counter"}
 const BREAK_ALPHA := 128.0 / 255.0
 const P2_HUE := 0.06  ## how far player 2's colors are shifted, 0 to 1
 const DIRS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]
@@ -34,6 +33,7 @@ var blocks := {}  ## Vector2i -> AnimatedSprite2D (counter, furnace or ice)
 var fruits := {}  ## Vector2i -> Sprite2D, only the wave being eaten
 var waves: Array = []  ## fruit kind (1 to 4) of every wave
 var wave_sizes: Array[int] = []  ## how many fruits every wave starts with
+var wave_cells: Array[Dictionary] = []  ## per wave: Vector2i -> fruit kind
 var wave := 0
 var score := 0.0
 var time_left := TIME_LIMIT
@@ -69,19 +69,18 @@ func _ready() -> void:
 	overlay.layer = 2
 	add_child(overlay)
 	_start_music()
-	_load_map()
+	var spots := _load_level()
 	_build_hud()
 	_load_wave()
-	var level: Dictionary = G.LEVELS[G.level - 1]
-	for c in level.enemies:
+	for c in spots.red:
 		enemies.append(_spawn(EnemyScript, c))
-	for c in level.get("green", []):
+	for c in spots.green:
 		enemies.append(_spawn(EnemyScript, c, {kind = "green"}))
 	var coop := G.players == 2
-	player = _spawn(PlayerScript, level.start, {controls = "p1_" if coop else ""})
+	player = _spawn(PlayerScript, spots.start, {controls = "p1_" if coop else ""})
 	players.append(player)
 	if coop:
-		var p2 := _spawn(PlayerScript, free_cell_near(level.start), {controls = "p2_"})
+		var p2 := _spawn(PlayerScript, free_cell_near(spots.start), {controls = "p2_"})
 		p2.material = ShaderMaterial.new()
 		p2.material.shader = preload("res://assets/hue_shift.gdshader")
 		p2.material.set_shader_parameter("hue_shift", P2_HUE)
@@ -221,7 +220,7 @@ func finish(won: bool) -> void:
 		G.sfx("win")
 	var banner := _banner("You Won!" if won else "You Lost!")
 	await get_tree().create_timer(END_DELAY, false).timeout
-	var last := G.level >= G.LEVELS.size()
+	var last := G.level >= G.level_count
 	var next := ["levels" if last else "next level", _next_level]
 	# The banner already says won or lost, so the popup only has buttons.
 	popup = G.popup(overlay, "", [next if won else ["restart", G.go.bind("game")], ["quit", G.go.bind("menu")]])
@@ -252,7 +251,7 @@ func _toggle_pause() -> void:
 
 ## After the last level there is no next one, so go back to the list.
 func _next_level() -> void:
-	if G.level >= G.LEVELS.size():
+	if G.level >= G.level_count:
 		G.go("level_select")
 	else:
 		G.level += 1
@@ -298,15 +297,42 @@ func is_ice(c: Vector2i) -> bool:
 	return blocks.has(c) and blocks[c].get_meta("kind") == "ice"
 
 
-func _load_map() -> void:
-	var rows := G.read_grid(G.level_file("map"))
+## Reads the level scene, levels/level_NN.tscn, made in the Godot editor:
+## - the "Map" layer holds the furnaces, counters and starting ice
+## - every layer named "Wave..." is one fruit wave, eaten in the order
+##   the layers are listed in the scene
+## - LevelSpawn markers say where the burger and the chefs start
+## The scene is only data. It is read here and freed, the game builds its
+## own block and fruit nodes from it.
+func _load_level() -> Dictionary:
 	for y in ROWS:
 		grid.append(PackedByteArray())
 		grid[y].resize(COLS)
-		for x in COLS:
-			var kind: int = rows[y][x]
-			if BLOCK_NAMES.has(kind):
-				add_block(Vector2i(x, y), BLOCK_NAMES[kind])
+	var scene: Node = load(G.level_path(G.level)).instantiate()
+	var spots := {start = Vector2i.ZERO, red = [], green = []}
+	for layer in scene.get_children():
+		if layer is TileMapLayer and layer.name == "Map":
+			for c in layer.get_used_cells():
+				if in_grid(c):
+					add_block(c, _tile_kind(layer, c))
+		elif layer is TileMapLayer and String(layer.name).begins_with("Wave"):
+			var cells := {}
+			for c in layer.get_used_cells():
+				cells[c] = int(_tile_kind(layer, c).trim_prefix("fruit_"))
+			wave_cells.append(cells)
+	for spawn in scene.get_node("Spawns").get_children():
+		if spawn is LevelSpawn:
+			match spawn.what:
+				LevelSpawn.What.BURGER: spots.start = spawn.cell()
+				LevelSpawn.What.RED_CHEF: spots.red.append(spawn.cell())
+				LevelSpawn.What.GREEN_CHEF: spots.green.append(spawn.cell())
+	scene.free()
+	return spots
+
+
+## The "kind" a tile was given in assets/level_tiles.tres, like "ice" or "fruit_2".
+static func _tile_kind(layer: TileMapLayer, c: Vector2i) -> String:
+	return layer.get_cell_tile_data(c).get_custom_data("kind")
 
 
 ## Places a counter, furnace or ice block. Blocks are 40 pixels tall and
@@ -403,14 +429,11 @@ func _load_wave() -> void:
 	for f in fruits.values():
 		f.queue_free()
 	fruits.clear()
-	var rows := G.read_grid(G.level_file("fruits_%d" % G.LEVELS[G.level - 1].waves[wave]))
-	for y in rows.size():
-		for x in rows[y].size():
-			if rows[y][x] != 0:
-				var f := _fruit_sprite(rows[y][x])
-				f.position = cell_center(Vector2i(x, y))
-				fruit_layer.add_child(f)
-				fruits[Vector2i(x, y)] = f
+	for c in wave_cells[wave]:
+		var f := _fruit_sprite(wave_cells[wave][c])
+		f.position = cell_center(c)
+		fruit_layer.add_child(f)
+		fruits[c] = f
 	_update_wave_box()
 
 
@@ -450,18 +473,6 @@ static func _fruit_sprite(kind: int) -> Sprite2D:
 	return f
 
 
-## The fruit kind and the number of fruits in one wave file.
-func _wave_info(file_number: int) -> Array:
-	var kind := 0
-	var count := 0
-	for row in G.read_grid("res://assets/levels/level%d/fruits_%d.txt" % [G.level, file_number]):
-		for k in row:
-			if k != 0:
-				kind = kind if kind else k
-				count += 1
-	return [kind if kind else 1, count]
-
-
 # --- HUD --------------------------------------------------------------------
 
 func _build_hud() -> void:
@@ -474,10 +485,9 @@ func _build_hud() -> void:
 
 	# Fruit waves in a box at the bottom: one slot per wave with the fruit
 	# and how many are left (current wave) or coming (later waves).
-	for file_number in G.LEVELS[G.level - 1].waves:
-		var info := _wave_info(file_number)
-		waves.append(info[0])
-		wave_sizes.append(info[1])
+	for cells in wave_cells:
+		waves.append(cells.values()[0] if cells else 1)
+		wave_sizes.append(cells.size())
 	var width := waves.size() * WAVE_SLOT + 12
 	var left := (G.W - width) / 2.0 + 6
 	G.panel(ui, Rect2(left - 6, 440, width, 36), "HudPanel")
