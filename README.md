@@ -87,6 +87,7 @@ The game should feel the same. Under the hood a few things got simpler:
 - The menus, popups and HUD use a Godot theme, `assets/ui_theme.tres`, instead of drawn images. Open it in the Godot editor to change colors, borders or fonts everywhere at once. Menus also work with a keyboard or a gamepad now.
 - The chefs find their way with Godot's built in pathfinding instead of our own.
 - The camera follows the burger, zoomed in 1.5 times so the kitchen feels closer. Change `ZOOM` at the top of `scripts/game.gd` to zoom in or out, 1.0 shows the whole kitchen like the original.
+- Pixels stay sharp and even: the game only ever scales by whole numbers, so one art pixel is always the same size on screen.
 - Walking feels smoother: the newest key wins, quick taps are never lost, you can turn back halfway through a step, and there is no tiny stop on every cell.
 - The floor is a checkerboard of dirt tiles, so you can see the grid you walk on.
 - Pausing really freezes everything now, ice timers included.
@@ -103,7 +104,7 @@ The game should feel the same. Under the hood a few things got simpler:
 | `assets/` | The sprite sheet, level tiles, UI theme, font and sounds |
 | `tests/` | The smoke test |
 | `tools/` | The script that builds the sprite sheet |
-| `docs/screenshots/` | The pictures used in this README |
+| `docs/` | The art guide and the pictures used in this README |
 | `art/sprites/` | The separate game sprite images, used to build the sheet |
 
 ## Making levels
@@ -134,6 +135,10 @@ The workflow can push the web build straight to your itch.io page with [butler](
 4. Add a variable called `ITCH_GAME` with your page, like `your-name/bad-burger`.
 
 The first time it uploads, open the game's edit page on itch.io and tick "This file will be played in the browser" for the `html5` file. After that every push updates the page by itself.
+
+## Helping with the art
+
+The art comes from a game jam and never got a proper pass. If you do pixel art and want to help, the [art guide](docs/ART_GUIDE.md) shows every sprite on the grid, what needs fixing and the sizes to aim for.
 
 ## Credits
 
