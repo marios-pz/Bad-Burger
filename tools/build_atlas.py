@@ -2,11 +2,14 @@
 
 Run it from the repo root:  python3 tools/build_atlas.py
 
-It writes two files:
-  assets/atlas.png    all images packed into a single texture
-  assets/sprites.tres a SpriteFrames resource. Every animation and every
-                      single image is an entry in it, so the game loads
-                      one texture and one resource for all its art.
+It writes three files:
+  assets/atlas.png       all images packed into a single texture
+  assets/sprites.tres    a SpriteFrames resource. Every animation and every
+                         single image is an entry in it, so the game loads
+                         one texture and one resource for all its art.
+  assets/level_tiles.png the things you paint into a level in the Godot
+                         editor, in a row of 32x40 cells for the TileSet
+                         in assets/level_tiles.tres
 
 Only game art lives here. Buttons, boxes and other UI come from the
 Godot theme in assets/ui_theme.tres.
@@ -56,6 +59,28 @@ STATICS = {
     "fruit_4": "fruits/grape.png",
     "alert": "exlamation_point.png",
 }
+
+
+# Tiles for painting levels, left to right. The TileSet finds them by the
+# "kind" custom data, not by their place in the row.
+LEVEL_TILES = ["furnace", "counter", "ice", "fruit_1", "fruit_2", "fruit_3", "fruit_4"]
+TILE_W, TILE_H = 32, 40  # blocks are 8 pixels taller than a cell
+
+
+def build_level_tiles():
+    strip = Image.new("RGBA", (TILE_W * len(LEVEL_TILES), TILE_H), (0, 0, 0, 0))
+    for i, name in enumerate(LEVEL_TILES):
+        img = Image.open(SRC / STATICS[name]).convert("RGBA")
+        if name.startswith("fruit_"):
+            # Same size as in the game: 90%, the grape squeezed to 24x24.
+            size = (24, 24) if name == "fruit_4" else (int(img.width * 0.9), int(img.height * 0.9))
+            img = img.resize(size, Image.NEAREST)
+            # centered on the 32x32 cell, which is the bottom of the 32x40 tile
+            spot = (i * TILE_W + (TILE_W - img.width) // 2, TILE_H - 32 + (32 - img.height) // 2)
+        else:
+            spot = (i * TILE_W, TILE_H - img.height)  # sits on the bottom of the cell
+        strip.paste(img, spot, img)
+    strip.save(OUT / "level_tiles.png")
 
 
 def natural_key(path: Path):
@@ -127,6 +152,7 @@ def main():
         + "\n[resource]\nanimations = [" + ", ".join(anims) + "]\n"
     )
     (OUT / "sprites.tres").write_text(tres)
+    build_level_tiles()
     print(f"atlas {ATLAS_WIDTH}x{height}, {len(unique)} images, {len(entries)} entries")
 
 

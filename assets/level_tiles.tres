@@ -1,0 +1,34 @@
+[gd_resource type="TileSet" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/level_tiles.png" id="1_i07vp"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_d2siy"]
+texture = ExtResource("1_i07vp")
+texture_region_size = Vector2i(32, 40)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 4)
+0:0/0/custom_data_0 = "furnace"
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, 4)
+1:0/0/custom_data_0 = "counter"
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, 4)
+2:0/0/custom_data_0 = "ice"
+3:0/0 = 0
+3:0/0/texture_origin = Vector2i(0, 4)
+3:0/0/custom_data_0 = "fruit_1"
+4:0/0 = 0
+4:0/0/texture_origin = Vector2i(0, 4)
+4:0/0/custom_data_0 = "fruit_2"
+5:0/0 = 0
+5:0/0/texture_origin = Vector2i(0, 4)
+5:0/0/custom_data_0 = "fruit_3"
+6:0/0 = 0
+6:0/0/texture_origin = Vector2i(0, 4)
+6:0/0/custom_data_0 = "fruit_4"
+
+[resource]
+tile_size = Vector2i(32, 32)
+custom_data_layer_0/name = "kind"
+custom_data_layer_0/type = 4
+sources/0 = SubResource("TileSetAtlasSource_d2siy")
