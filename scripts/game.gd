@@ -10,12 +10,18 @@ extends Node2D
 const TILE := 32
 const COLS := 20
 const ROWS := 15
-## Floor tiles: a checkerboard of two dirt tones with dark grout lines and
-## a light top edge, so every cell of the grid is easy to see.
+## Floor: cells alternate two dirt tones and have a dark edge, and each
+## cell is split into 2x2 small tiles with thinner lines and a light top.
 const FLOOR_A := Color8(96, 48, 24)
 const FLOOR_B := Color8(84, 41, 20)
-const FLOOR_GROUT := Color8(52, 24, 11)
+const FLOOR_GROUT := Color8(52, 24, 11)  ## the edge of a cell
+const FLOOR_LINE := Color8(70, 33, 16)  ## between the small tiles
 const FLOOR_SHINE := Color8(112, 60, 32)
+const FLOOR_SHADE := Color8(66, 31, 15)
+const FLOOR_TILE := 16
+## true: one tone with a dark bottom edge on every small tile, as if seen
+## from an angle. The other floor style we tried, kept as a quick switch.
+const FLOOR_ANGLED := false
 const TIME_LIMIT := 120.0
 const ZOOM := 1.5  ## how close the camera is, 1.0 shows the whole kitchen
 const END_DELAY := 2.0  ## seconds the win or lose animation plays before the popup
@@ -95,13 +101,24 @@ func _ready() -> void:
 
 
 func _draw() -> void:
+	# The floor is finer than the grid: every cell is 2x2 small tiles, so
+	# blocks and characters do not look oversized. Cells still alternate
+	# two tones and have a darker edge, so the grid you walk on stays clear.
 	for y in ROWS:
 		for x in COLS:
-			var r := Rect2(x * TILE, y * TILE, TILE, TILE)
-			draw_rect(r, FLOOR_A if (x + y) % 2 == 0 else FLOOR_B)
-			draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(TILE - 1, 1)), FLOOR_SHINE)
-			draw_rect(Rect2(r.position, Vector2(TILE, 1)), FLOOR_GROUT)
-			draw_rect(Rect2(r.position, Vector2(1, TILE)), FLOOR_GROUT)
+			var cell := Vector2(x, y) * TILE
+			var tone := FLOOR_B if FLOOR_ANGLED else (FLOOR_A if (x + y) % 2 == 0 else FLOOR_B)
+			for ty in 2:
+				for tx in 2:
+					var t := cell + Vector2(tx, ty) * FLOOR_TILE
+					draw_rect(Rect2(t, Vector2.ONE * FLOOR_TILE), tone)
+					draw_rect(Rect2(t + Vector2(1, 1), Vector2(FLOOR_TILE - 1, 1)), FLOOR_SHINE)
+					if FLOOR_ANGLED:
+						draw_rect(Rect2(t + Vector2(1, FLOOR_TILE - 1), Vector2(FLOOR_TILE - 1, 1)), FLOOR_SHADE)
+					draw_rect(Rect2(t, Vector2(FLOOR_TILE, 1)), FLOOR_LINE)
+					draw_rect(Rect2(t, Vector2(1, FLOOR_TILE)), FLOOR_LINE)
+			draw_rect(Rect2(cell, Vector2(TILE, 1)), FLOOR_GROUT)
+			draw_rect(Rect2(cell, Vector2(1, TILE)), FLOOR_GROUT)
 
 
 func _process(delta: float) -> void:
