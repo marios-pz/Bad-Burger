@@ -72,9 +72,6 @@ def build_level_tiles():
     for i, name in enumerate(LEVEL_TILES):
         img = Image.open(SRC / STATICS[name]).convert("RGBA")
         if name.startswith("fruit_"):
-            # Same size as in the game: 90%, the grape squeezed to 24x24.
-            size = (24, 24) if name == "fruit_4" else (int(img.width * 0.9), int(img.height * 0.9))
-            img = img.resize(size, Image.NEAREST)
             # centered on the 32x32 cell, which is the bottom of the 32x40 tile
             spot = (i * TILE_W + (TILE_W - img.width) // 2, TILE_H - 32 + (32 - img.height) // 2)
         else:

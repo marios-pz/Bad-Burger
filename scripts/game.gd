@@ -191,8 +191,14 @@ func _move_camera(delta: float) -> void:
 	# Keep about 3 cells of room around the burgers on every side.
 	var room := box.size + Vector2(6, 6) * TILE
 	var fit := minf(G.W / room.x, G.H / room.y)
-	var target := clampf(fit, 1.0, ZOOM)
-	cam.zoom = Vector2.ONE * (target if delta == 0.0 else lerpf(cam.zoom.x, target, 1.0 - exp(-4.0 * delta)))
+	# Pick a zoom where one art pixel covers a whole number of screen
+	# pixels. The window already scales by a whole number (1x, 2x, 3x),
+	# so zoom times that scale must be a whole number too.
+	var window_scale := G.window_scale()
+	var pixels := clampf(floorf(fit * window_scale), window_scale, roundf(ZOOM * window_scale))
+	var target := pixels / window_scale
+	var zoom := lerpf(cam.zoom.x, target, 1.0 - exp(-4.0 * delta))
+	cam.zoom = Vector2.ONE * (target if delta == 0.0 or absf(zoom - target) < 0.01 else zoom)
 
 
 ## Creates the burger or a chef on cell c. props are set before it
@@ -463,12 +469,11 @@ func _revive_burgers() -> void:
 			p.revive(free_cell_near(standing[0].cell))
 
 
-## Fruit drawn a bit smaller than a tile, the grape is squeezed to 24x24.
+## Fruit is drawn at its true size. Scaling pixel art by odd amounts makes
+## its pixels uneven, so nothing in the game is scaled except the camera.
 static func _fruit_sprite(kind: int) -> Sprite2D:
 	var f := Sprite2D.new()
 	f.texture = G.tex("fruit_%d" % kind)
-	var s := f.texture.get_size()
-	f.scale = Vector2(24, 24) / s if kind == 4 else (s * 0.9).floor() / s
 	f.set_meta("kind", kind)
 	return f
 
@@ -490,15 +495,14 @@ func _build_hud() -> void:
 		wave_sizes.append(cells.size())
 	var width := waves.size() * WAVE_SLOT + 12
 	var left := (G.W - width) / 2.0 + 6
-	G.panel(ui, Rect2(left - 6, 440, width, 36), "HudPanel")
+	G.panel(ui, Rect2(left - 6, 436, width, 40), "HudPanel")
 	for i in waves.size():
 		var x := left + i * WAVE_SLOT
 		var icon := _fruit_sprite(waves[i])
-		icon.scale *= 0.8
-		icon.position = Vector2(x + 17, 456)
+		icon.position = Vector2(x + 17, 454)
 		ui.add_child(icon)
 		wave_icons.append(icon)
-		wave_counts.append(G.label(ui, "", 26, Rect2(x + 36, 442, WAVE_SLOT - 36, 28), HORIZONTAL_ALIGNMENT_LEFT))
+		wave_counts.append(G.label(ui, "", 26, Rect2(x + 36, 439, WAVE_SLOT - 36, 30), HORIZONTAL_ALIGNMENT_LEFT))
 	wave_box = ReferenceRect.new()
 	wave_box.editor_only = false
 	wave_box.border_color = Color(0.784, 0.271, 0.227)
@@ -520,8 +524,8 @@ func _update_wave_box() -> void:
 	if wave_box == null:
 		return
 	# The box frames the whole slot of the current wave, fruit and number.
-	wave_box.size = Vector2(WAVE_SLOT - 2, 28)
-	wave_box.position = wave_icons[wave].position + Vector2(-15, -14)
+	wave_box.size = Vector2(WAVE_SLOT - 2, 32)
+	wave_box.position = wave_icons[wave].position + Vector2(-15, -16)
 
 
 func _update_hud() -> void:

@@ -27,6 +27,7 @@ window/size/viewport_height=480
 window/size/window_width_override=1280
 window/size/window_height_override=960
 window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
 
 [gui]
 
@@ -135,6 +136,8 @@ p2_cast={
 3d/physics_engine="Jolt Physics"
 
 [rendering]
+
+2d/snap/snap_2d_transforms_to_pixel=true
 
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"

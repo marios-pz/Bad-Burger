@@ -44,6 +44,13 @@ func save_settings() -> void:
 	cfg.save(SETTINGS_PATH)
 
 
+## How many screen pixels one game pixel takes up, always a whole number
+## because the project uses the "integer" stretch scale mode.
+func window_scale() -> float:
+	var size := get_window().size
+	return maxf(1.0, floorf(minf(size.x / float(W), size.y / float(H))))
+
+
 func level_path(n: int) -> String:
 	return "res://levels/level_%02d.tscn" % n
 
