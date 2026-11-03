@@ -4,3 +4,6 @@
 
 # Exported builds
 /build/
+
+# Local helper files
+/utils/
