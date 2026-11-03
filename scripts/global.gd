@@ -99,6 +99,11 @@ func label(parent: Node, text: String, font_size: int, rect: Rect2,
 	l.position = rect.position
 	l.size = rect.size
 	parent.add_child(l)
+	# A label that is too short for its font grows downwards, which pushes
+	# the text below the middle of rect. Grow it evenly up and down instead.
+	var extra := l.get_minimum_size().y - rect.size.y
+	if extra > 0:
+		l.position.y -= extra / 2.0
 	return l
 
 
